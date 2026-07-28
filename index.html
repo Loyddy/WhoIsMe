@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的主页 | AI分身</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .chat-bubble-self {
+                @apply bg-primary text-white rounded-2xl rounded-tr-none ml-auto;
+            }
+            .chat-bubble-ai {
+                @apply bg-gray-100 text-gray-800 rounded-2xl rounded-tl-none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 lg:py-12">
+        <div class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+            <!-- 左侧：个人信息区域 -->
+            <aside class="lg:w-[320px] w-full bg-white rounded-2xl shadow-lg p-8 h-fit sticky top-8">
+                <!-- 头像 -->
+                <div class="flex justify-center mb-6">
+                    <div class="w-36 h-36 rounded-full bg-slate-200 overflow-hidden border-4 border-primary/20">
+                        <!-- 替换头像地址，放自己图片 -->
+                        <img src="https://picsum.photos/id/1005/300/300" class="w-full h-full object-cover" alt="头像">
+                    </div>
+                </div>
+                <h2 class="text-center text-2xl font-bold text-dark mb-2">你的名字</h2>
+                <p class="text-center text-gray-500 mb-6">个人标签 / 身份简介</p>
+
+                <div class="space-y-4 text-gray-600">
+                    <p><i class="fa fa-user-circle w-6 text-primary"></i> 关于我</p>
+                    <p class="text-sm leading-relaxed">
+                        在这里填写你的个人介绍，爱好、擅长的技能、日常等等。
+                    </p>
+                    <p><i class="fa fa-code w-6 text-primary"></i> 技能</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能1</span>
+                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能2</span>
+                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能3</span>
+                    </div>
+                </div>
+
+                <hr class="my-6">
+
+                <!-- 社交链接 -->
+                <div class="flex justify-center gap-5 text-xl">
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-github"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-weibo"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-envelope"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-link"></i></a>
+                </div>
+            </aside>
+
+            <!-- 右侧：AI分身对话 -->
+            <main class="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-[700px]">
+                <!-- 对话头部 -->
+                <div class="px-6 py-4 border-b flex items-center gap-3 bg-slate-50">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                        <i class="fa fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">我的AI分身</h3>
+                        <p class="text-xs text-gray-400">可以和我聊天，了解主人</p>
+                    </div>
+                </div>
+
+                <!-- 聊天消息容器 -->
+                <div id="chatBox" class="flex-1 p-5 overflow-y-auto scrollbar-hide space-y-4">
+                    <div class="chat-bubble-ai px-4 py-3 max-w-[80%]">
+                        你好！我是主人的AI分身，你可以向我提问，了解关于主人的一切😊
+                    </div>
+                </div>
+
+                <!-- 输入框区域 -->
+                <div class="p-4 border-t flex gap-3">
+                    <input id="userInput" type="text" placeholder="输入消息，和AI分身对话..."
+                           class="flex-1 px-4 py-3 rounded-full bg-slate-100 outline-none focus:ring-2 focus:ring-primary/40">
+                    <button onclick="sendMessage()"
+                            class="bg-primary text-white px-5 py-3 rounded-full hover:bg-blue-600 transition">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ==========【重要】在这里设置AI分身的知识库！修改这里==========
+        const aiKnowledge = {
+            name: "你的名字",
+            intro: "一个热爱生活、喜欢学习的创作者",
+            hobby: "听歌、编程、摄影、旅行",
+            skill: "前端开发、写作、设计",
+            contact: "可以通过邮箱联系我",
+            defaultReply: "暂时我还不懂这个问题，换个话题问问关于主人的爱好、技能吧！"
+        };
+
+        // 简单问答匹配（你可以无限扩充问答）
+        function getAiReply(text) {
+            const msg = text.toLowerCase();
+            if (msg.includes("名字") || msg.includes("叫什么")) {
+                return `主人名字是${aiKnowledge.name}`;
+            }
+            if (msg.includes("介绍") || msg.includes("是谁")) {
+                return aiKnowledge.intro;
+            }
+            if (msg.includes("爱好") || msg.includes("喜欢什么")) {
+                return `主人的爱好：${aiKnowledge.hobby}`;
+            }
+            if (msg.includes("会什么") || msg.includes("技能")) {
+                return `主人擅长：${aiKnowledge.skill}`;
+            }
+            if (msg.includes("联系方式") || msg.includes("怎么联系")) {
+                return aiKnowledge.contact;
+            }
+            if (msg.includes("你好") || msg.includes("hi") || msg.includes("hello")) {
+                return "你好呀！有什么想了解主人的？";
+            }
+            return aiKnowledge.defaultReply;
+        }
+
+        // 发送消息逻辑
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const chatBox = document.getElementById("chatBox");
+            const content = input.value.trim();
+            if (!content) return;
+
+            // 用户消息
+            chatBox.innerHTML += `<div class="chat-bubble-self px-4 py-3 max-w-[80%]">${content}</div>`;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // AI回复（模拟延迟）
+            setTimeout(() => {
+                const reply = getAiReply(content);
+                chatBox.innerHTML += `<div class="chat-bubble-ai px-4 py-3 max-w-[80%]">${reply}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 600);
+        }
+
+        // 回车发送消息
+        document.getElementById("userInput").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>

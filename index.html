@@ -44,7 +44,6 @@
                 <!-- 头像 -->
                 <div class="flex justify-center mb-6">
                     <div class="w-36 h-36 rounded-full bg-slate-200 overflow-hidden border-4 border-primary/20">
-                        <!-- 替换头像地址，放自己图片 -->
                         <img src="https://picsum.photos/id/1005/300/300" class="w-full h-full object-cover" alt="头像">
                     </div>
                 </div>
@@ -91,7 +90,7 @@
                 <!-- 聊天消息容器 -->
                 <div id="chatBox" class="flex-1 p-5 overflow-y-auto scrollbar-hide space-y-4">
                     <div class="chat-bubble-ai px-4 py-3 max-w-[80%]">
-                        你好！我是主人的AI分身，你可以向我提问，了解关于主人的一切😊
+                        你好！我是主人的数字分身，你可以向我询问任何关于主人的事情😊
                     </div>
                 </div>
 
@@ -99,9 +98,9 @@
                 <div class="p-4 border-t flex gap-3">
                     <input id="userInput" type="text" placeholder="输入消息，和AI分身对话..."
                            class="flex-1 px-4 py-3 rounded-full bg-slate-100 outline-none focus:ring-2 focus:ring-primary/40">
-                    <button onclick="sendMessage()"
-                            class="bg-primary text-white px-5 py-3 rounded-full hover:bg-blue-600 transition">
-                        <i class="fa fa-paper-plane"></i>
+                    <button id="sendBtn" onclick="sendMessage()"
+                            class="bg-primary text-white px-5 py-3 rounded-full hover:bg-blue-600 transition flex items-center justify-center min-w-[50px]">
+                        <i class="fa fa-paper-plane" id="sendIcon"></i>
                     </button>
                 </div>
             </main>
@@ -109,63 +108,125 @@
     </div>
 
     <script>
-        // ==========【重要】在这里设置AI分身的知识库！修改这里==========
-        const aiKnowledge = {
-            name: "你的名字",
-            intro: "一个热爱生活、喜欢学习的创作者",
-            hobby: "听歌、编程、摄影、旅行",
-            skill: "前端开发、写作、设计",
-            contact: "可以通过邮箱联系我",
-            defaultReply: "暂时我还不懂这个问题，换个话题问问关于主人的爱好、技能吧！"
+        // =================【配置区域】=================
+        const API_CONFIG = {
+            // API 密钥 (生产环境建议通过后端代理，前端写死仅供演示/测试)
+            apiKey: "YOUR_API_KEY_HERE",
+            // 接口地址，以 DeepSeek / OpenAI 为例，可换成实际支持 OpenAI 格式的 endpoint
+            apiUrl: "https://api.deepseek.com/chat/completions",
+            // 使用的模型名称
+            model: "deepseek-chat",
+            // 给 AI 设定个人设定和性格（System Prompt）
+            systemPrompt: `你是我（[你的名字]）的数字分身。你需要以第一人称（“我”）的口吻回应访客。
+以下是关于我的基本信息：
+- 名字：你的名字
+- 职业/身份：前端开发者 / 创作者
+- 技能：HTML, CSS, JavaScript, Vue, Tailwind CSS
+- 爱好：编程、听歌、摄影、旅行
+- 联系方式：your_email@example.com
+- 性格特点：友善、风趣、热情。
+
+要求：
+1. 始终以我（主人）的身份作答，向大家介绍我自己。
+2. 回答要自然、有亲和力，简明扼要。
+3. 如果被问到知识库里没有提及的事情，可以礼貌表达并推荐对方通过邮箱联系我。`
         };
+        // ===============================================
 
-        // 简单问答匹配（你可以无限扩充问答）
-        function getAiReply(text) {
-            const msg = text.toLowerCase();
-            if (msg.includes("名字") || msg.includes("叫什么")) {
-                return `主人名字是${aiKnowledge.name}`;
-            }
-            if (msg.includes("介绍") || msg.includes("是谁")) {
-                return aiKnowledge.intro;
-            }
-            if (msg.includes("爱好") || msg.includes("喜欢什么")) {
-                return `主人的爱好：${aiKnowledge.hobby}`;
-            }
-            if (msg.includes("会什么") || msg.includes("技能")) {
-                return `主人擅长：${aiKnowledge.skill}`;
-            }
-            if (msg.includes("联系方式") || msg.includes("怎么联系")) {
-                return aiKnowledge.contact;
-            }
-            if (msg.includes("你好") || msg.includes("hi") || msg.includes("hello")) {
-                return "你好呀！有什么想了解主人的？";
-            }
-            return aiKnowledge.defaultReply;
-        }
+        // 保存历史对话上下文（实现多轮对话）
+        let messagesHistory = [
+            { role: "system", content: API_CONFIG.systemPrompt }
+        ];
 
-        // 发送消息逻辑
-        function sendMessage() {
+        // 发送消息核心逻辑
+        async function sendMessage() {
             const input = document.getElementById("userInput");
+            const sendBtn = document.getElementById("sendBtn");
+            const sendIcon = document.getElementById("sendIcon");
             const chatBox = document.getElementById("chatBox");
             const content = input.value.trim();
+
             if (!content) return;
 
-            // 用户消息
-            chatBox.innerHTML += `<div class="chat-bubble-self px-4 py-3 max-w-[80%]">${content}</div>`;
+            // 1. 禁用输入框与发送按钮，显示加载状态
             input.value = "";
-            chatBox.scrollTop = chatBox.scrollHeight;
+            input.disabled = true;
+            sendBtn.disabled = true;
+            sendIcon.className = "fa fa-spinner fa-spin";
 
-            // AI回复（模拟延迟）
-            setTimeout(() => {
-                const reply = getAiReply(content);
-                chatBox.innerHTML += `<div class="chat-bubble-ai px-4 py-3 max-w-[80%]">${reply}</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 600);
+            // 2. 追加用户消息至界面与历史数组
+            appendBubble(content, 'self');
+            messagesHistory.push({ role: "user", content: content });
+
+            // 3. 创建临时“正在思考...”泡泡
+            const loadingBubbleId = appendBubble("AI 正在思考中...", 'ai');
+
+            try {
+                // 4. 调用 AI 接口
+                const response = await fetch(API_CONFIG.apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${API_CONFIG.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: API_CONFIG.model,
+                        messages: messagesHistory,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiReply = data.choices[0].message.content;
+
+                // 5. 更新 AI 历史记录及界面内容
+                messagesHistory.push({ role: "assistant", content: aiReply });
+                updateBubble(loadingBubbleId, aiReply);
+
+            } catch (error) {
+                console.error("AI 接口请求错误:", error);
+                updateBubble(loadingBubbleId, "抱歉，API 连接好像出了点问题，请稍后再试！");
+            } finally {
+                // 6. 恢复输入框状态
+                input.disabled = false;
+                sendBtn.disabled = false;
+                sendIcon.className = "fa fa-paper-plane";
+                input.focus();
+            }
         }
 
-        // 回车发送消息
+        // 辅助函数：追加消息气泡
+        function appendBubble(text, type) {
+            const chatBox = document.getElementById("chatBox");
+            const bubbleId = 'bubble-' + Date.now();
+            const bubbleClass = type === 'self' ? 'chat-bubble-self' : 'chat-bubble-ai';
+
+            const html = `<div id="${bubbleId}" class="${bubbleClass} px-4 py-3 max-w-[80%] break-words">${text}</div>`;
+            chatBox.insertAdjacentHTML('beforeend', html);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return bubbleId;
+        }
+
+        // 辅助函数：更新现有气泡内容
+        function updateBubble(id, text) {
+            const bubble = document.getElementById(id);
+            if (bubble) {
+                bubble.innerText = text;
+                const chatBox = document.getElementById("chatBox");
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // 绑定回车发送
         document.getElementById("userInput").addEventListener("keydown", function (e) {
-            if (e.key === "Enter") sendMessage();
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
     </script>
 </body>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>科幻个人主页 · AI 分身</title>
+    <title>Sci-Fi Personal Hub · AI Avatar</title>
     <style>
-        /* ----- 科幻风重设 & 变量 ----- */
+        /* ----- Sci-Fi Reset & Variables ----- */
         * {
             margin: 0;
             padding: 0;
@@ -37,12 +37,12 @@
             padding: 24px;
             backdrop-filter: blur(2px);
             margin: 0;
-            /* 保证canvas覆盖全屏 */
             position: relative;
             overflow-x: hidden;
+            cursor: default;
         }
 
-        /* 动态画布背景 —— 全屏覆盖 */
+        /* Dynamic canvas background - fullscreen */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -50,11 +50,11 @@
             width: 100vw;
             height: 100vh;
             z-index: 0;
-            pointer-events: none;  /* 让鼠标事件穿透 */
+            pointer-events: none;
             display: block;
         }
 
-        /* 主容器 — 相对z-index 置于画布之上，撑满视口 */
+        /* Main container */
         .container {
             display: flex;
             gap: 28px;
@@ -63,13 +63,12 @@
             flex-wrap: wrap;
             position: relative;
             z-index: 10;
-            /* 让两个卡片更宽，覆盖更多区域 */
             padding: 20px 30px;
             min-height: 80vh;
             align-items: stretch;
         }
 
-        /* 卡片 — 玻璃态 + 霓虹边框，弹性扩大 */
+        /* Cards */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
@@ -90,13 +89,12 @@
             box-shadow: 0 0 45px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.04);
         }
 
-        /* ---------- 模块一：个人基本信息 (科幻精简) ---------- */
+        /* Profile Header */
         .profile-header {
             text-align: center;
             margin-bottom: 18px;
         }
 
-        /* 头像 —— 全息投影感 */
         .avatar {
             width: 120px;
             height: 120px;
@@ -174,7 +172,6 @@
             font-weight: 400;
         }
 
-        /* 社交链接 */
         .social-links {
             display: flex;
             gap: 20px;
@@ -213,7 +210,7 @@
             transform: scale(0.96);
         }
 
-        /* ---------- 模块二：AI 聊天框 (科幻感) ---------- */
+        /* AI Chat */
         .chat-container {
             display: flex;
             flex-direction: column;
@@ -247,7 +244,6 @@
             opacity: 0.8;
         }
 
-        /* 聊天记录区域 */
         .chat-box {
             flex: 1;
             overflow-y: auto;
@@ -259,7 +255,6 @@
             scroll-behavior: smooth;
         }
 
-        /* 消息气泡 */
         .message {
             max-width: 82%;
             padding: 14px 18px;
@@ -291,7 +286,6 @@
             box-shadow: 0 0 25px rgba(107, 92, 255, 0.2);
         }
 
-        /* 输入区域 */
         .input-area {
             display: flex;
             gap: 12px;
@@ -355,7 +349,6 @@
             transform: scale(0.95);
         }
 
-
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -378,18 +371,15 @@
                 padding: 10px 12px;
                 min-height: 100vh;
             }
-
             .card {
                 min-width: 0;
                 width: 100%;
                 flex: 1 1 auto;
             }
-
             .chat-container {
                 height: 420px;
                 min-height: 360px;
             }
-
             .social-links a {
                 padding: 8px 20px;
                 font-size: 13px;
@@ -405,28 +395,112 @@
         .card .profile-desc {
             flex: 1;
         }
+
+        /* ----- Cursor Trail Control (bottom-right) ----- */
+        .cursor-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            background: rgba(10, 12, 28, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            border-radius: 40px;
+            padding: 12px 20px 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.08);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            min-width: 180px;
+        }
+
+        .cursor-control:hover {
+            border-color: rgba(0, 229, 255, 0.6);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.12);
+        }
+
+        .cursor-control label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #b0bbee;
+            font-weight: 300;
+        }
+
+        .cursor-control select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: #e8eaff;
+            padding: 6px 12px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: border 0.2s;
+        }
+
+        .cursor-control select:hover,
+        .cursor-control select:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 20px #00e5ff22;
+        }
+
+        .cursor-control select option {
+            background: #141a2b;
+            color: #e8eaff;
+        }
+
+        .cursor-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 12px #00e5ff;
+            margin-left: 4px;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @media (max-width: 600px) {
+            .cursor-control {
+                bottom: 16px;
+                right: 16px;
+                padding: 10px 16px 10px 18px;
+                font-size: 12px;
+                min-width: 140px;
+                gap: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                border-radius: 28px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- 动态画布背景 -->
+    <!-- Dynamic Canvas Background -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="container">
-        <!-- 模块一：个人基本信息-->
+        <!-- Module 1: Personal Info -->
         <div class="card">
             <div class="profile-header">
                 <div class="avatar">✦</div>
                 <h2>Loyd_Wang</h2>
                 <span class="tagline">Fortune Favors the Sweat</span>
             </div>
-
             <div class="profile-desc">
-                <p>👾 终身学习者 · 构建未来的碎片。<br>
-                欢迎进入我的个人星域。右侧是我的 <strong>AI 分身</strong>，你可以直接向它提问，快速了解我的世界。</p>
+                <p>Welcome to my personal star sector. On the right is my <strong>AI avatar</strong> — feel free to ask it anything to quickly explore my world.</p>
             </div>
-
-            <!-- GitHub 和 Email -->
             <div class="social-links">
                 <a href="https://github.com/Loyddy" target="_blank">
                     <span style="opacity:0.7;">⌨</span> GitHub
@@ -437,11 +511,11 @@
             </div>
         </div>
 
-        <!-- 模块二：AI 对话框  -->
+        <!-- Module 2: AI Chat -->
         <div class="card chat-container">
             <div class="chat-title">AI Avatar</div>
             <div class="chat-box" id="chat-box">
-                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him?</div>
+                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him?(you can use any language you want)</div>
             </div>
             <div class="input-area">
                 <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
@@ -450,8 +524,25 @@
         </div>
     </div>
 
+    <!-- Cursor Trail Control (bottom-right) -->
+    <div class="cursor-control" id="cursorControl">
+        <label>
+            <span>✦ Trail</span>
+            <select id="trailPreset">
+                <option value="none">Off</option>
+                <option value="neon" selected>Neon</option>
+                <option value="cyber">Cyber</option>
+                <option value="ghost">Ghost</option>
+                <option value="flow">Flow</option>
+                <option value="pulse">Pulse</option>
+                <option value="stardust">Stardust</option>
+            </select>
+            <span class="cursor-indicator"></span>
+        </label>
+    </div>
+
     <script>
-        // ---------- 动态科幻背景 (粒子 + 星云) ----------
+        // ---------- Dynamic Sci-Fi Background (Particles + Nebula) ----------
         (function initBackground() {
             const canvas = document.getElementById('bg-canvas');
             const ctx = canvas.getContext('2d');
@@ -478,7 +569,6 @@
                     this.speedX = (Math.random() - 0.5) * MAX_SPEED * 1.8;
                     this.speedY = (Math.random() - 0.5) * MAX_SPEED * 1.8;
                     this.opacity = Math.random() * 0.6 + 0.2;
-                    // 颜色：偏向蓝紫
                     this.color = `hsla(${220 + Math.random() * 60}, 80%, 70%, ${this.opacity})`;
                 }
                 update() {
@@ -494,21 +584,17 @@
                     ctx.shadowColor = '#6b5cff';
                     ctx.shadowBlur = 18;
                     ctx.fill();
-                    // 不加shadowBlur重置以免影响其他绘制，但为了性能，单独重置
                     ctx.shadowBlur = 0;
                 }
             }
 
-            // 初始化粒子
             for (let i = 0; i < PARTICLE_COUNT; i++) {
                 particles.push(new Particle());
             }
 
-            // 额外绘制一些缓慢漂移的“星云”光晕 (动态)
             let timeOffset = 0;
 
             function drawNebula() {
-                // 绘制几个半透明光晕，移动
                 const gradient1 = ctx.createRadialGradient(
                     width * 0.2 + Math.sin(timeOffset * 0.0003) * 80,
                     height * 0.3 + Math.cos(timeOffset * 0.0005) * 60,
@@ -539,7 +625,6 @@
             }
 
             function drawLines() {
-                // 连接靠近的粒子，形成网状
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
@@ -563,57 +648,46 @@
 
             function animate() {
                 ctx.clearRect(0, 0, width, height);
-                // 绘制背景深空（保持透明，让css背景透出一点）
-                // 但我们的canvas覆盖，所以直接绘制半透明底色
                 ctx.fillStyle = 'rgba(7, 9, 15, 0.3)';
                 ctx.fillRect(0, 0, width, height);
-
                 timeOffset += 1;
                 drawNebula();
-
-                // 更新和绘制粒子
                 for (let p of particles) {
                     p.update();
                     p.draw();
                 }
                 drawLines();
-
                 requestAnimationFrame(animate);
             }
-
             animate();
         })();
 
-        // ---------- AI 聊天逻辑 ----------
+        // ---------- AI Chat Logic ----------
         const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
 
         async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const text = inputField.value.trim();
             if (!text) return;
-
             appendMessage(text, 'user');
             inputField.value = '';
-
-            const loadingId = appendMessage('⟡ 正在处理神经信号 ...', 'ai');
-
+            const loadingId = appendMessage('⟡ Processing neural signal ...', 'ai');
             try {
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text })
                 });
-
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
                 if (data.reply) {
                     appendMessage(data.reply, 'ai');
                 } else {
-                    appendMessage("⚠️ 量子链路波动，请稍后再试。", 'ai');
+                    appendMessage("⚠️ Quantum link fluctuation, please retry.", 'ai');
                 }
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                appendMessage("❌ 无法连接到 AI 核心，请检查后端服务 (CORS)。", 'ai');
+                appendMessage("❌ Connection lost. Check your quantum bridge.", 'ai');
             }
         }
 
@@ -636,6 +710,208 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('user-input').focus();
         });
+
+        // ---------- Cursor Trail Effect (Enhanced) ----------
+        (function initTrail() {
+            const trailCanvas = document.createElement('canvas');
+            trailCanvas.id = 'trail-canvas';
+            trailCanvas.style.position = 'fixed';
+            trailCanvas.style.top = '0';
+            trailCanvas.style.left = '0';
+            trailCanvas.style.width = '100vw';
+            trailCanvas.style.height = '100vh';
+            trailCanvas.style.pointerEvents = 'none';
+            trailCanvas.style.zIndex = '9999';
+            document.body.appendChild(trailCanvas);
+
+            const ctx = trailCanvas.getContext('2d');
+            let w, h;
+
+            function resizeTrail() {
+                w = trailCanvas.width = window.innerWidth;
+                h = trailCanvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeTrail);
+            resizeTrail();
+
+            let points = [];
+            const MAX_POINTS = 45;
+            let currentPreset = 'neon';
+            let time = 0;
+
+            // Preset configurations (different styles)
+            const presets = {
+                none: { size: 0, alpha: 0, color: 'rgba(0,0,0,0)', blur: 0, gap: 0, shape: 'line' },
+                neon: { size: 5, alpha: 0.6, color: '0, 229, 255', blur: 22, gap: 2, shape: 'line' },
+                cyber: { size: 7, alpha: 0.7, color: '179, 136, 255', blur: 28, gap: 3, shape: 'line' },
+                ghost: { size: 11, alpha: 0.25, color: '200, 220, 255', blur: 40, gap: 4, shape: 'line' },
+                flow: { size: 6, alpha: 0.5, color: '255, 100, 180', blur: 30, gap: 1, shape: 'wave' },
+                pulse: { size: 9, alpha: 0.6, color: '255, 200, 50', blur: 35, gap: 2, shape: 'dot' },
+                stardust: { size: 4, alpha: 0.7, color: '150, 200, 255', blur: 18, gap: 0, shape: 'star' }
+            };
+
+            function getPreset(name) {
+                return presets[name] || presets.neon;
+            }
+
+            function addPoint(x, y) {
+                const preset = getPreset(currentPreset);
+                if (preset.size === 0) {
+                    points = [];
+                    return;
+                }
+                if (points.length > 0) {
+                    const last = points[points.length - 1];
+                    const dx = x - last.x;
+                    const dy = y - last.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < preset.gap + 1) return;
+                }
+                points.push({ x, y, life: 1.0, offset: Math.random() * Math.PI * 2 });
+                if (points.length > MAX_POINTS) points.shift();
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                addPoint(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                if (touch) addPoint(touch.clientX, touch.clientY);
+            }, { passive: true });
+
+            const select = document.getElementById('trailPreset');
+            select.addEventListener('change', () => {
+                currentPreset = select.value;
+                if (currentPreset === 'none') {
+                    points = [];
+                }
+            });
+
+            function drawShape(ctx, x, y, size, alpha, preset, life) {
+                const shape = preset.shape || 'line';
+                const color = preset.color;
+                const blur = preset.blur * life;
+                ctx.shadowColor = `rgba(${color}, ${alpha * 0.6})`;
+                ctx.shadowBlur = blur;
+
+                switch (shape) {
+                    case 'dot':
+                        ctx.beginPath();
+                        ctx.arc(x, y, size * 0.6 * life, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.7})`;
+                        ctx.fill();
+                        break;
+                    case 'star':
+                        const spikes = 5;
+                        const outerRadius = size * 0.7 * life;
+                        const innerRadius = outerRadius * 0.4;
+                        ctx.beginPath();
+                        for (let i = 0; i < spikes * 2; i++) {
+                            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                            const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+                            const cx = x + Math.cos(angle) * radius;
+                            const cy = y + Math.sin(angle) * radius;
+                            if (i === 0) ctx.moveTo(cx, cy);
+                            else ctx.lineTo(cx, cy);
+                        }
+                        ctx.closePath();
+                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.6})`;
+                        ctx.fill();
+                        break;
+                    case 'wave':
+                        const waveSize = size * 0.8 * life;
+                        ctx.beginPath();
+                        for (let i = 0; i < 12; i++) {
+                            const angle = (i / 12) * Math.PI * 2 + time * 0.05;
+                            const r = waveSize * (0.8 + 0.2 * Math.sin(angle * 3 + time * 0.1));
+                            const px = x + Math.cos(angle) * r;
+                            const py = y + Math.sin(angle) * r;
+                            if (i === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.4})`;
+                        ctx.fill();
+                        ctx.strokeStyle = `rgba(${color}, ${alpha * 0.5})`;
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                        break;
+                    default:
+                        break;
+                }
+                ctx.shadowBlur = 0;
+            }
+
+            function drawTrail() {
+                ctx.clearRect(0, 0, w, h);
+                time += 1;
+
+                const preset = getPreset(currentPreset);
+                if (preset.size === 0 || points.length < 2) {
+                    requestAnimationFrame(drawTrail);
+                    return;
+                }
+
+                for (let i = 0; i < points.length; i++) {
+                    points[i].life -= 0.012;
+                }
+                points = points.filter(p => p.life > 0);
+
+                if (points.length < 2) {
+                    requestAnimationFrame(drawTrail);
+                    return;
+                }
+
+                // Draw connecting lines (for line style)
+                if (preset.shape === 'line' || preset.shape === 'wave' || preset.shape === 'star' || preset.shape === 'dot') {
+                    for (let i = 0; i < points.length - 1; i++) {
+                        const p1 = points[i];
+                        const p2 = points[i + 1];
+                        const life = (p1.life + p2.life) / 2;
+                        const alpha = life * preset.alpha;
+                        const size = preset.size * (0.3 + 0.7 * life);
+
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(${preset.color}, ${alpha})`;
+                        ctx.lineWidth = size;
+                        ctx.lineCap = 'round';
+                        ctx.shadowColor = `rgba(${preset.color}, ${alpha * 0.6})`;
+                        ctx.shadowBlur = preset.blur * life;
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+                    }
+                }
+
+                // Draw endpoint shape for each point (except line-only)
+                if (preset.shape !== 'line') {
+                    for (let p of points) {
+                        const alpha = p.life * preset.alpha;
+                        const size = preset.size * (0.2 + 0.8 * p.life);
+                        drawShape(ctx, p.x, p.y, size, alpha, preset, p.life);
+                    }
+                } else {
+                    // For line preset, draw a small glow at the tip
+                    const last = points[points.length - 1];
+                    if (last) {
+                        const alpha = last.life * preset.alpha;
+                        ctx.beginPath();
+                        ctx.arc(last.x, last.y, preset.size * 0.5 * last.life, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${preset.color}, ${alpha * 0.5})`;
+                        ctx.shadowColor = `rgba(${preset.color}, ${alpha * 0.8})`;
+                        ctx.shadowBlur = preset.blur * 1.2;
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                }
+
+                requestAnimationFrame(drawTrail);
+            }
+
+            drawTrail();
+        })();
     </script>
 </body>
 </html>

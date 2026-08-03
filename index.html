@@ -36,19 +36,40 @@
             color: var(--text-primary);
             padding: 24px;
             backdrop-filter: blur(2px);
+            margin: 0;
+            /* 保证canvas覆盖全屏 */
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* 主容器 — 科幻网格线 (纯装饰) */
+        /* 动态画布背景 —— 全屏覆盖 */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;  /* 让鼠标事件穿透 */
+            display: block;
+        }
+
+        /* 主容器 — 相对z-index 置于画布之上，撑满视口 */
         .container {
             display: flex;
             gap: 28px;
-            max-width: 1100px;
+            max-width: 1300px;
             width: 100%;
             flex-wrap: wrap;
             position: relative;
+            z-index: 10;
+            /* 让两个卡片更宽，覆盖更多区域 */
+            padding: 20px 30px;
+            min-height: 80vh;
+            align-items: stretch;
         }
 
-        /* 卡片 — 玻璃态 + 霓虹边框 */
+        /* 卡片 — 玻璃态 + 霓虹边框，弹性扩大 */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
@@ -57,9 +78,11 @@
             padding: 32px 28px;
             border: 1px solid rgba(107, 92, 255, 0.25);
             box-shadow: var(--shadow-glow), inset 0 0 40px rgba(0, 229, 255, 0.03);
-            flex: 1;
-            min-width: 310px;
+            flex: 1 1 40%;
+            min-width: 340px;
             transition: box-shadow 0.3s ease, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
@@ -92,12 +115,24 @@
             box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), inset 0 0 35px rgba(107, 92, 255, 0.3);
             transition: 0.4s;
             background-image: radial-gradient(circle at 30% 25%, #6b5cff20, transparent 60%);
+            position: relative;
         }
 
         .avatar:hover {
             transform: scale(1.03);
             border-color: #00e5ff;
             box-shadow: 0 0 60px #00e5ff55, inset 0 0 50px #6b5cff55;
+        }
+
+        .avatar::after {
+            content: '';
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00e5ff10, transparent 70%);
+            animation: pulseGlow 3s infinite;
+            pointer-events: none;
         }
 
         .profile-header h2 {
@@ -131,14 +166,21 @@
             padding-left: 16px;
             margin: 20px 0 22px;
             background: linear-gradient(90deg, rgba(0, 229, 255, 0.03), transparent);
+            flex: 1;
         }
 
-        /* 社交链接 —— 只保留 GitHub & Email (科幻按钮) */
+        .profile-desc strong {
+            color: #b388ff;
+            font-weight: 400;
+        }
+
+        /* 社交链接 */
         .social-links {
             display: flex;
             gap: 20px;
             justify-content: center;
             margin-top: 24px;
+            flex-wrap: wrap;
         }
 
         .social-links a {
@@ -175,12 +217,14 @@
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 460px;
+            height: 500px;
             padding: 28px 24px 24px;
             background: rgba(10, 12, 28, 0.6);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 229, 255, 0.2);
             box-shadow: 0 0 40px rgba(0, 229, 255, 0.06), inset 0 0 50px rgba(0, 0, 0, 0.5);
+            flex: 1;
+            min-height: 460px;
         }
 
         .chat-title {
@@ -215,7 +259,7 @@
             scroll-behavior: smooth;
         }
 
-        /* 消息气泡 — 科幻风格 */
+        /* 消息气泡 */
         .message {
             max-width: 82%;
             padding: 14px 18px;
@@ -247,7 +291,7 @@
             box-shadow: 0 0 25px rgba(107, 92, 255, 0.2);
         }
 
-        /* 输入区域 — 未来感 */
+        /* 输入区域 */
         .input-area {
             display: flex;
             gap: 12px;
@@ -311,7 +355,7 @@
             transform: scale(0.95);
         }
 
-        /* 自定义滚动条 — 极简科幻 */
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -327,20 +371,23 @@
             box-shadow: 0 0 20px #6b5cff66;
         }
 
-        /* 小屏适配 */
         @media (max-width: 760px) {
             .container {
                 flex-direction: column;
                 align-items: center;
+                padding: 10px 12px;
+                min-height: 100vh;
             }
 
             .card {
                 min-width: 0;
                 width: 100%;
+                flex: 1 1 auto;
             }
 
             .chat-container {
                 height: 420px;
+                min-height: 360px;
             }
 
             .social-links a {
@@ -349,131 +396,246 @@
             }
         }
 
-        /* 额外的科幻点缀：glow 脉冲 */
         @keyframes pulseGlow {
             0% { opacity: 0.4; }
             50% { opacity: 0.8; }
             100% { opacity: 0.4; }
         }
 
-        .avatar::after {
-            content: '';
-            position: absolute;
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #00e5ff10, transparent 70%);
-            animation: pulseGlow 3s infinite;
-            pointer-events: none;
-        }
-
-        .avatar {
-            position: relative;
-        }
-
-        /* 精简描述中的微光 */
-        .profile-desc strong {
-            color: #b388ff;
-            font-weight: 400;
+        .card .profile-desc {
+            flex: 1;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- 模块一：个人基本信息 (科幻版，只留 GitHub & Email) -->
-    <div class="card">
-        <div class="profile-header">
-            <div class="avatar">✦</div>
-            <h2>Loyddy</h2>
-            <span class="tagline">✦ 数字边界 ✦</span>
+    <!-- 动态画布背景 -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <!-- 模块一：个人基本信息-->
+        <div class="card">
+            <div class="profile-header">
+                <div class="avatar">✦</div>
+                <h2>Loyd_Wang</h2>
+                <span class="tagline">Fortune Favors the Sweat</span>
+            </div>
+
+            <div class="profile-desc">
+                <p>👾 终身学习者 · 构建未来的碎片。<br>
+                欢迎进入我的个人星域。右侧是我的 <strong>AI 分身</strong>，你可以直接向它提问，快速了解我的世界。</p>
+            </div>
+
+            <!-- GitHub 和 Email -->
+            <div class="social-links">
+                <a href="https://github.com/Loyddy" target="_blank">
+                    <span style="opacity:0.7;">⌨</span> GitHub
+                </a>
+                <a href="mailto:hunshi061226@163.com">
+                    <span style="opacity:0.7;">✉</span> Email
+                </a>
+            </div>
         </div>
 
-        <div class="profile-desc">
-            <p>👾 终身学习者 · 构建未来的碎片。<br>
-            欢迎进入我的个人星域。右侧是我的 <strong>AI 分身</strong>，你可以直接向它提问，快速了解我的世界。</p>
-        </div>
-
-        <!-- 只保留 GitHub 和 Email，其他社交移除 -->
-        <div class="social-links">
-            <a href="https://github.com/Loyddy" target="_blank">
-                <span style="opacity:0.7;">⌨</span> GitHub
-            </a>
-            <a href="mailto:hunshi061226@163.com">
-                <span style="opacity:0.7;">✉</span> Email
-            </a>
+        <!-- 模块二：AI 对话框  -->
+        <div class="card chat-container">
+            <div class="chat-title">AI Avatar</div>
+            <div class="chat-box" id="chat-box">
+                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him?</div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()">send</button>
+            </div>
         </div>
     </div>
 
-    <!-- 模块二：AI 分身对话框 (科幻强化) -->
-    <div class="card chat-container">
-        <div class="chat-title">AI 分身 · 量子镜像</div>
-        <div class="chat-box" id="chat-box">
-            <div class="message msg-ai">✦ 信号已链接。我是主人的 AI 分身。你想了解关于他的什么？</div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="输入问题 ... 例如：他的技能？" onkeypress="handleEnter(event)">
-            <button onclick="sendMessage()">发送</button>
-        </div>
-    </div>
-</div>
+    <script>
+        // ---------- 动态科幻背景 (粒子 + 星云) ----------
+        (function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const PARTICLE_COUNT = 160;
+            const MAX_SPEED = 0.25;
 
-<script>
-    // 后端地址 (保持不变)
-    const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
-
-    async function sendMessage() {
-        const inputField = document.getElementById('user-input');
-        const text = inputField.value.trim();
-        if (!text) return;
-
-        appendMessage(text, 'user');
-        inputField.value = '';
-
-        const loadingId = appendMessage('⟡ 正在处理神经信号 ...', 'ai');
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
-
-            const data = await response.json();
-
-            document.getElementById(loadingId).remove();
-            if (data.reply) {
-                appendMessage(data.reply, 'ai');
-            } else {
-                appendMessage("⚠️ 量子链路波动，请稍后再试。", 'ai');
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
             }
-        } catch (error) {
-            document.getElementById(loadingId).remove();
-            appendMessage("❌ 无法连接到 AI 核心，请检查后端服务 (CORS)。", 'ai');
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 2.2 + 0.6;
+                    this.speedX = (Math.random() - 0.5) * MAX_SPEED * 1.8;
+                    this.speedY = (Math.random() - 0.5) * MAX_SPEED * 1.8;
+                    this.opacity = Math.random() * 0.6 + 0.2;
+                    // 颜色：偏向蓝紫
+                    this.color = `hsla(${220 + Math.random() * 60}, 80%, 70%, ${this.opacity})`;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > width) { this.speedX *= -1; this.x += this.speedX * 2; }
+                    if (this.y < 0 || this.y > height) { this.speedY *= -1; this.y += this.speedY * 2; }
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowColor = '#6b5cff';
+                    ctx.shadowBlur = 18;
+                    ctx.fill();
+                    // 不加shadowBlur重置以免影响其他绘制，但为了性能，单独重置
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            // 初始化粒子
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+
+            // 额外绘制一些缓慢漂移的“星云”光晕 (动态)
+            let timeOffset = 0;
+
+            function drawNebula() {
+                // 绘制几个半透明光晕，移动
+                const gradient1 = ctx.createRadialGradient(
+                    width * 0.2 + Math.sin(timeOffset * 0.0003) * 80,
+                    height * 0.3 + Math.cos(timeOffset * 0.0005) * 60,
+                    10,
+                    width * 0.2 + Math.sin(timeOffset * 0.0003) * 80,
+                    height * 0.3 + Math.cos(timeOffset * 0.0005) * 60,
+                    350
+                );
+                gradient1.addColorStop(0, 'rgba(90, 60, 255, 0.08)');
+                gradient1.addColorStop(0.5, 'rgba(0, 200, 255, 0.04)');
+                gradient1.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = gradient1;
+                ctx.fillRect(0, 0, width, height);
+
+                const gradient2 = ctx.createRadialGradient(
+                    width * 0.8 + Math.cos(timeOffset * 0.0004) * 70,
+                    height * 0.7 + Math.sin(timeOffset * 0.0006) * 50,
+                    20,
+                    width * 0.8 + Math.cos(timeOffset * 0.0004) * 70,
+                    height * 0.7 + Math.sin(timeOffset * 0.0006) * 50,
+                    400
+                );
+                gradient2.addColorStop(0, 'rgba(180, 70, 255, 0.06)');
+                gradient2.addColorStop(0.6, 'rgba(0, 150, 255, 0.03)');
+                gradient2.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = gradient2;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            function drawLines() {
+                // 连接靠近的粒子，形成网状
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 140) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            const alpha = (1 - dist / 140) * 0.25;
+                            ctx.strokeStyle = `rgba(120, 160, 255, ${alpha})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.shadowBlur = 8;
+                            ctx.shadowColor = '#6b5cff';
+                            ctx.stroke();
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                // 绘制背景深空（保持透明，让css背景透出一点）
+                // 但我们的canvas覆盖，所以直接绘制半透明底色
+                ctx.fillStyle = 'rgba(7, 9, 15, 0.3)';
+                ctx.fillRect(0, 0, width, height);
+
+                timeOffset += 1;
+                drawNebula();
+
+                // 更新和绘制粒子
+                for (let p of particles) {
+                    p.update();
+                    p.draw();
+                }
+                drawLines();
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        })();
+
+        // ---------- AI 聊天逻辑 ----------
+        const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            inputField.value = '';
+
+            const loadingId = appendMessage('⟡ 正在处理神经信号 ...', 'ai');
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                if (data.reply) {
+                    appendMessage(data.reply, 'ai');
+                } else {
+                    appendMessage("⚠️ 量子链路波动，请稍后再试。", 'ai');
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                appendMessage("❌ 无法连接到 AI 核心，请检查后端服务 (CORS)。", 'ai');
+            }
         }
-    }
 
-    function appendMessage(text, sender) {
-        const chatBox = document.getElementById('chat-box');
-        const msgDiv = document.createElement('div');
-        const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-        msgDiv.id = msgId;
-        msgDiv.className = `message msg-${sender}`;
-        msgDiv.textContent = text;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgId;
-    }
+        function appendMessage(text, sender) {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+            msgDiv.id = msgId;
+            msgDiv.className = `message msg-${sender}`;
+            msgDiv.textContent = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgId;
+        }
 
-    function handleEnter(event) {
-        if (event.key === 'Enter') sendMessage();
-    }
+        function handleEnter(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
 
-    // 可选：自动聚焦输入框
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('user-input').focus();
-    });
-</script>
-
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('user-input').focus();
+        });
+    </script>
 </body>
 </html>

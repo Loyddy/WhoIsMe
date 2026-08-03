@@ -3,231 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的主页 | AI分身</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        dark: '#1e293b',
-                    }
-                }
-            }
+    <title>我的个人主页 & AI 分身</title>
+    <style>
+        :root {
+            --primary-color: #9b72cf; /* 淡紫色主色调 */
+            --bg-color: #f7f5fb;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-light: #666666;
+            --border-radius: 16px;
         }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-            }
-            .scrollbar-hide {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            .chat-bubble-self {
-                @apply bg-primary text-white rounded-2xl rounded-tr-none ml-auto;
-            }
-            .chat-bubble-ai {
-                @apply bg-gray-100 text-gray-800 rounded-2xl rounded-tl-none;
-            }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
+
+        .container {
+            display: flex;
+            gap: 24px;
+            max-width: 1000px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(155, 114, 207, 0.1);
+            flex: 1;
+            min-width: 320px;
+        }
+
+        /* 模块一：基本信息 */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .social-links a {
+            text-decoration: none;
+            color: white;
+            background-color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        .social-links a:hover { opacity: 0.8; }
+
+        /* 模块二：AI 聊天框 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+        .chat-title {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 5px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .msg-ai {
+            background-color: #f0e6ff;
+            color: #4a2b75;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .msg-user {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+        .input-area input:focus {
+            border-color: var(--primary-color);
+        }
+        .input-area button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .input-area button:hover {
+            background-color: #835cba;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d3c4e3; border-radius: 3px; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8 lg:py-12">
-        <div class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
-            <!-- 左侧：个人信息区域 -->
-            <aside class="lg:w-[320px] w-full bg-white rounded-2xl shadow-lg p-8 h-fit sticky top-8">
-                <!-- 头像 -->
-                <div class="flex justify-center mb-6">
-                    <div class="w-36 h-36 rounded-full bg-slate-200 overflow-hidden border-4 border-primary/20">
-                        <img src="https://picsum.photos/id/1005/300/300" class="w-full h-full object-cover" alt="头像">
-                    </div>
-                </div>
-                <h2 class="text-center text-2xl font-bold text-dark mb-2">你的名字</h2>
-                <p class="text-center text-gray-500 mb-6">个人标签 / 身份简介</p>
+<body>
 
-                <div class="space-y-4 text-gray-600">
-                    <p><i class="fa fa-user-circle w-6 text-primary"></i> 关于我</p>
-                    <p class="text-sm leading-relaxed">
-                        在这里填写你的个人介绍，爱好、擅长的技能、日常等等。
-                    </p>
-                    <p><i class="fa fa-code w-6 text-primary"></i> 技能</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能1</span>
-                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能2</span>
-                        <span class="px-2 py-1 bg-blue-50 text-primary text-xs rounded">技能3</span>
-                    </div>
-                </div>
-
-                <hr class="my-6">
-
-                <!-- 社交链接 -->
-                <div class="flex justify-center gap-5 text-xl">
-                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-github"></i></a>
-                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-weibo"></i></a>
-                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-envelope"></i></a>
-                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fa fa-link"></i></a>
-                </div>
-            </aside>
-
-            <!-- 右侧：AI分身对话 -->
-            <main class="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-[700px]">
-                <!-- 对话头部 -->
-                <div class="px-6 py-4 border-b flex items-center gap-3 bg-slate-50">
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
-                        <i class="fa fa-robot"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">我的AI分身</h3>
-                        <p class="text-xs text-gray-400">可以和我聊天，了解主人</p>
-                    </div>
-                </div>
-
-                <!-- 聊天消息容器 -->
-                <div id="chatBox" class="flex-1 p-5 overflow-y-auto scrollbar-hide space-y-4">
-                    <div class="chat-bubble-ai px-4 py-3 max-w-[80%]">
-                        你好！我是主人的数字分身，你可以向我询问任何关于主人的事情😊
-                    </div>
-                </div>
-
-                <!-- 输入框区域 -->
-                <div class="p-4 border-t flex gap-3">
-                    <input id="userInput" type="text" placeholder="输入消息，和AI分身对话..."
-                           class="flex-1 px-4 py-3 rounded-full bg-slate-100 outline-none focus:ring-2 focus:ring-primary/40">
-                    <button id="sendBtn" onclick="sendMessage()"
-                            class="bg-primary text-white px-5 py-3 rounded-full hover:bg-blue-600 transition flex items-center justify-center min-w-[50px]">
-                        <i class="fa fa-paper-plane" id="sendIcon"></i>
-                    </button>
-                </div>
-            </main>
+<div class="container">
+    <!-- 模块一：个人基本信息 -->
+    <div class="card">
+        <div class="profile-header">
+            <div class="avatar">头像</div>
+            <h2>你的名字</h2>
+            <p style="color: var(--text-light); margin-top: 10px;">前端开发者 / AI 爱好者 / 终身学习者</p>
+        </div>
+        <div style="line-height: 1.8; color: var(--text-light);">
+            <p>你好！欢迎来到我的主页。我致力于构建优秀的 Web 应用程序。右侧是我的数字分身，如果你想快速了解我，可以直接向它提问！</p>
+        </div>
+        <div class="social-links">
+            <a href="https://github.com/你的用户名" target="_blank">GitHub</a>
+            <a href="https://twitter.com/你的用户名" target="_blank">Twitter</a>
+            <a href="mailto:your-email@example.com">Email</a>
         </div>
     </div>
 
-    <script>
-        // =================【配置区域】=================
-        const API_CONFIG = {
-            // API 密钥 (生产环境建议通过后端代理，前端写死仅供演示/测试)
-            apiKey: "apikey",
-            // 接口地址，以 DeepSeek / OpenAI 为例，可换成实际支持 OpenAI 格式的 endpoint
-            apiUrl: "https://api.deepseek.com/chat/completions",
-            // 使用的模型名称
-            model: "deepseek-chat",
-            // 给 AI 设定个人设定和性格（System Prompt）
-            systemPrompt: `你是我（[你的名字]）的数字分身。你需要以第一人称（“我”）的口吻回应访客。
-以下是关于我的基本信息：
-- 名字：你的名字
-- 职业/身份：前端开发者 / 创作者
-- 技能：HTML, CSS, JavaScript, Vue, Tailwind CSS
-- 爱好：编程、听歌、摄影、旅行
-- 联系方式：your_email@example.com
-- 性格特点：友善、风趣、热情。
+    <!-- 模块二：AI 分身对话框 -->
+    <div class="card chat-container">
+        <h3 class="chat-title">✨ 我的 AI 分身</h3>
+        <div class="chat-box" id="chat-box">
+            <div class="message msg-ai">你好！我是主人的 AI 分身，我已经掌握了他的基本信息、技能栈和项目经历。你想了解关于他的什么呢？</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="问我任何关于他的问题..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+</div>
 
-要求：
-1. 始终以我（主人）的身份作答，向大家介绍我自己。
-2. 回答要自然、有亲和力，简明扼要。
-3. 如果被问到知识库里没有提及的事情，可以礼貌表达并推荐对方通过邮箱联系我。`
-        };
-        // ===============================================
+<script>
+    const BACKEND_URL = "https://backend-render-qs89.onrender.com";
 
-        // 保存历史对话上下文（实现多轮对话）
-        let messagesHistory = [
-            { role: "system", content: API_CONFIG.systemPrompt }
-        ];
+    async function sendMessage() {
+        const inputField = document.getElementById('user-input');
+        const text = inputField.value.trim();
+        if (!text) return;
 
-        // 发送消息核心逻辑
-        async function sendMessage() {
-            const input = document.getElementById("userInput");
-            const sendBtn = document.getElementById("sendBtn");
-            const sendIcon = document.getElementById("sendIcon");
-            const chatBox = document.getElementById("chatBox");
-            const content = input.value.trim();
+        appendMessage(text, 'user');
+        inputField.value = '';
 
-            if (!content) return;
+        const loadingId = appendMessage('正在思考中...', 'ai');
 
-            // 1. 禁用输入框与发送按钮，显示加载状态
-            input.value = "";
-            input.disabled = true;
-            sendBtn.disabled = true;
-            sendIcon.className = "fa fa-spinner fa-spin";
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
 
-            // 2. 追加用户消息至界面与历史数组
-            appendBubble(content, 'self');
-            messagesHistory.push({ role: "user", content: content });
+            const data = await response.json();
 
-            // 3. 创建临时“正在思考...”泡泡
-            const loadingBubbleId = appendBubble("AI 正在思考中...", 'ai');
-
-            try {
-                // 4. 调用 AI 接口
-                const response = await fetch(API_CONFIG.apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${API_CONFIG.apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: API_CONFIG.model,
-                        messages: messagesHistory,
-                        temperature: 0.7
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`请求失败：${response.status}`);
-                }
-
-                const data = await response.json();
-                const aiReply = data.choices[0].message.content;
-
-                // 5. 更新 AI 历史记录及界面内容
-                messagesHistory.push({ role: "assistant", content: aiReply });
-                updateBubble(loadingBubbleId, aiReply);
-
-            } catch (error) {
-                console.error("AI 接口请求错误:", error);
-                updateBubble(loadingBubbleId, "抱歉，API 连接好像出了点问题，请稍后再试！");
-            } finally {
-                // 6. 恢复输入框状态
-                input.disabled = false;
-                sendBtn.disabled = false;
-                sendIcon.className = "fa fa-paper-plane";
-                input.focus();
+            // 移除 Loading 状态并添加真实回复
+            document.getElementById(loadingId).remove();
+            if(data.reply) {
+                appendMessage(data.reply, 'ai');
+            } else {
+                appendMessage("抱歉，我的大脑暂时断线了，请稍后再试。", 'ai');
             }
+        } catch (error) {
+            document.getElementById(loadingId).remove();
+            appendMessage("网络请求失败，请确保后端服务已启动并配置了跨域(CORS)。", 'ai');
         }
+    }
 
-        // 辅助函数：追加消息气泡
-        function appendBubble(text, type) {
-            const chatBox = document.getElementById("chatBox");
-            const bubbleId = 'bubble-' + Date.now();
-            const bubbleClass = type === 'self' ? 'chat-bubble-self' : 'chat-bubble-ai';
+    function appendMessage(text, sender) {
+        const chatBox = document.getElementById('chat-box');
+        const msgDiv = document.createElement('div');
+        const msgId = 'msg-' + Date.now();
+        msgDiv.id = msgId;
+        msgDiv.className = `message msg-${sender}`;
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return msgId;
+    }
 
-            const html = `<div id="${bubbleId}" class="${bubbleClass} px-4 py-3 max-w-[80%] break-words">${text}</div>`;
-            chatBox.insertAdjacentHTML('beforeend', html);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return bubbleId;
-        }
+    function handleEnter(event) {
+        if (event.key === 'Enter') sendMessage();
+    }
+</script>
 
-        // 辅助函数：更新现有气泡内容
-        function updateBubble(id, text) {
-            const bubble = document.getElementById(id);
-            if (bubble) {
-                bubble.innerText = text;
-                const chatBox = document.getElementById("chatBox");
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        // 绑定回车发送
-        document.getElementById("userInput").addEventListener("keydown", function (e) {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-    </script>
 </body>
 </html>

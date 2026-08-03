@@ -286,9 +286,10 @@
             box-shadow: 0 0 25px rgba(107, 92, 255, 0.2);
         }
 
+        /* ===== 修复输入框排版 ===== */
         .input-area {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-top: 6px;
             background: rgba(0, 0, 0, 0.3);
             padding: 4px;
@@ -296,6 +297,8 @@
             border: 1px solid rgba(0, 229, 255, 0.15);
             backdrop-filter: blur(8px);
             transition: border 0.2s;
+            flex-wrap: nowrap;          /* 强制一行，不换行 */
+            align-items: center;        /* 垂直居中 */
         }
 
         .input-area:focus-within {
@@ -304,7 +307,8 @@
         }
 
         .input-area input {
-            flex: 1;
+            flex: 1 1 auto;            /* 自动伸缩，占据剩余空间 */
+            min-width: 0;              /* 防止溢出 */
             padding: 14px 18px;
             background: transparent;
             border: none;
@@ -313,6 +317,7 @@
             font-size: 14px;
             font-family: var(--font-mono);
             letter-spacing: 0.5px;
+            width: 100%;               /* 保证宽度自适应 */
         }
 
         .input-area input::placeholder {
@@ -322,6 +327,7 @@
         }
 
         .input-area button {
+            flex: 0 0 auto;            /* 不伸缩，保持按钮宽度 */
             background: linear-gradient(145deg, #3d3f7a, #26285a);
             border: none;
             color: white;
@@ -336,6 +342,9 @@
             text-shadow: 0 0 10px #6b5cff;
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
             font-family: var(--font-mono);
+            white-space: nowrap;        /* 防止按钮文字换行 */
+            height: 48px;               /* 固定高度，与输入框对齐 */
+            line-height: 1;
         }
 
         .input-area button:hover {
@@ -347,6 +356,23 @@
 
         .input-area button:active {
             transform: scale(0.95);
+        }
+
+        /* 重置按钮单独样式，保持与发送按钮一致 */
+        .btn-reset {
+            background: rgba(255, 50, 50, 0.15) !important;
+            border-color: rgba(255, 50, 50, 0.3) !important;
+            padding: 0 16px !important;
+            font-size: 20px !important;
+            text-shadow: none !important;
+            flex: 0 0 auto !important;
+            min-width: 48px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 50, 50, 0.3) !important;
+            border-color: rgba(255, 50, 50, 0.6) !important;
+            box-shadow: 0 0 30px rgba(255, 50, 50, 0.2) !important;
         }
 
         ::-webkit-scrollbar {
@@ -362,6 +388,32 @@
             background: linear-gradient(180deg, #6b5cff, #00e5ff);
             border-radius: 10px;
             box-shadow: 0 0 20px #6b5cff66;
+        }
+
+        /* 移动端适配：输入框保持一行，按钮适当缩小 */
+        @media (max-width: 600px) {
+            .input-area {
+                flex-wrap: nowrap;
+                gap: 6px;
+                padding: 4px;
+                border-radius: 60px;
+            }
+            .input-area input {
+                padding: 12px 14px;
+                font-size: 13px;
+                min-width: 0;
+            }
+            .input-area button {
+                padding: 0 14px;
+                font-size: 12px;
+                height: 42px;
+                min-width: 36px;
+            }
+            .btn-reset {
+                padding: 0 10px !important;
+                font-size: 16px !important;
+                min-width: 36px;
+            }
         }
 
         @media (max-width: 760px) {
@@ -515,11 +567,13 @@
         <div class="card chat-container">
             <div class="chat-title">AI Avatar</div>
             <div class="chat-box" id="chat-box">
-                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him?(you can use any language you want)</div>
+                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him? (you can use any language you want)</div>
             </div>
+            <!-- 修复后的输入区域 -->
             <div class="input-area">
                 <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
                 <button onclick="sendMessage()">send</button>
+                <button class="btn-reset" onclick="resetChat()" title="重置对话">⟳</button>
             </div>
         </div>
     </div>
@@ -662,26 +716,48 @@
             animate();
         })();
 
-        // ---------- AI Chat Logic ----------
+        // ---------- AI Chat Logic (带记忆) ----------
         const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
 
+        // ===== 维护对话历史 =====
+        let chatHistory = [];
+        const MAX_HISTORY = 20; // 最多保存20轮对话
+
+        // ===== 发送消息 =====
         async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const text = inputField.value.trim();
             if (!text) return;
+
+            // 添加用户消息到界面
             appendMessage(text, 'user');
+            // 添加到历史记录
+            chatHistory.push({ role: "user", content: text });
+
             inputField.value = '';
             const loadingId = appendMessage('⟡ Processing neural signal ...', 'ai');
+
             try {
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({
+                        message: text,
+                        history: chatHistory  // 发送完整历史
+                    })
                 });
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
+
                 if (data.reply) {
                     appendMessage(data.reply, 'ai');
+                    // 添加AI回复到历史记录
+                    chatHistory.push({ role: "assistant", content: data.reply });
+
+                    // 限制历史长度
+                    if (chatHistory.length > MAX_HISTORY * 2) {
+                        chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
+                    }
                 } else {
                     appendMessage("⚠️ Quantum link fluctuation, please retry.", 'ai');
                 }
@@ -691,6 +767,7 @@
             }
         }
 
+        // ===== 添加消息到界面 =====
         function appendMessage(text, sender) {
             const chatBox = document.getElementById('chat-box');
             const msgDiv = document.createElement('div');
@@ -703,10 +780,25 @@
             return msgId;
         }
 
+        // ===== 重置对话 =====
+        function resetChat() {
+            if (chatHistory.length > 0 && !confirm('确定要重置对话吗？')) {
+                return;
+            }
+            chatHistory = [];
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = `
+                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him? (you can use any language you want)</div>
+            `;
+            document.getElementById('user-input').focus();
+        }
+
+        // ===== 回车发送 =====
         function handleEnter(event) {
             if (event.key === 'Enter') sendMessage();
         }
 
+        // ===== 页面加载 =====
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('user-input').focus();
         });
@@ -739,7 +831,6 @@
             let currentPreset = 'neon';
             let time = 0;
 
-            // Preset configurations (different styles)
             const presets = {
                 none: { size: 0, alpha: 0, color: 'rgba(0,0,0,0)', blur: 0, gap: 0, shape: 'line' },
                 neon: { size: 5, alpha: 0.6, color: '0, 229, 255', blur: 22, gap: 2, shape: 'line' },
@@ -863,7 +954,6 @@
                     return;
                 }
 
-                // Draw connecting lines (for line style)
                 if (preset.shape === 'line' || preset.shape === 'wave' || preset.shape === 'star' || preset.shape === 'dot') {
                     for (let i = 0; i < points.length - 1; i++) {
                         const p1 = points[i];
@@ -885,7 +975,6 @@
                     }
                 }
 
-                // Draw endpoint shape for each point (except line-only)
                 if (preset.shape !== 'line') {
                     for (let p of points) {
                         const alpha = p.life * preset.alpha;
@@ -893,7 +982,6 @@
                         drawShape(ctx, p.x, p.y, size, alpha, preset, p.life);
                     }
                 } else {
-                    // For line preset, draw a small glow at the tip
                     const last = points[points.length - 1];
                     if (last) {
                         const alpha = last.life * preset.alpha;

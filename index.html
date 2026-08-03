@@ -3,190 +3,423 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页 & AI 分身</title>
+    <title>科幻个人主页 · AI 分身</title>
     <style>
-        :root {
-            --primary-color: #9b72cf; /* 淡紫色主色调 */
-            --bg-color: #f7f5fb;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-light: #666666;
-            --border-radius: 16px;
+        /* ----- 科幻风重设 & 变量 ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-primary: #0b0d1a;
+            --bg-card: rgba(18, 22, 40, 0.75);
+            --border-glow: #6b5cff;
+            --text-primary: #e8eaff;
+            --text-secondary: #a6b0e0;
+            --accent-cyan: #00e5ff;
+            --accent-purple: #b388ff;
+            --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.15);
+            --font-mono: 'Segoe UI', 'JetBrains Mono', monospace;
+            --radius-lg: 24px;
+            --radius-sm: 14px;
+        }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background: radial-gradient(circle at 20% 30%, #141a2b, #07090f 90%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            padding: 24px;
+            backdrop-filter: blur(2px);
         }
 
+        /* 主容器 — 科幻网格线 (纯装饰) */
         .container {
             display: flex;
-            gap: 24px;
-            max-width: 1000px;
+            gap: 28px;
+            max-width: 1100px;
             width: 100%;
             flex-wrap: wrap;
+            position: relative;
         }
 
+        /* 卡片 — 玻璃态 + 霓虹边框 */
         .card {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: 0 8px 24px rgba(155, 114, 207, 0.1);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            border: 1px solid rgba(107, 92, 255, 0.25);
+            box-shadow: var(--shadow-glow), inset 0 0 40px rgba(0, 229, 255, 0.03);
             flex: 1;
-            min-width: 320px;
+            min-width: 310px;
+            transition: box-shadow 0.3s ease, border-color 0.3s;
         }
 
-        /* 模块一：基本信息 */
+        .card:hover {
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 45px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.04);
+        }
+
+        /* ---------- 模块一：个人基本信息 (科幻精简) ---------- */
         .profile-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
+
+        /* 头像 —— 全息投影感 */
         .avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background-color: var(--primary-color);
-            margin: 0 auto 15px;
+            margin: 0 auto 16px;
+            background: linear-gradient(145deg, #3d3f7a, #1d1f3a);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #b388ff;
+            text-shadow: 0 0 20px #6b5cff, 0 0 60px #3d3f7a;
+            border: 2px solid rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), inset 0 0 35px rgba(107, 92, 255, 0.3);
+            transition: 0.4s;
+            background-image: radial-gradient(circle at 30% 25%, #6b5cff20, transparent 60%);
         }
+
+        .avatar:hover {
+            transform: scale(1.03);
+            border-color: #00e5ff;
+            box-shadow: 0 0 60px #00e5ff55, inset 0 0 50px #6b5cff55;
+        }
+
+        .profile-header h2 {
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #e8eaff, #b388ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+            text-shadow: 0 0 30px #6b5cff55;
+        }
+
+        .profile-header .tagline {
+            color: var(--text-secondary);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            display: inline-block;
+            padding-top: 6px;
+            margin-top: 4px;
+        }
+
+        .profile-desc {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-size: 15px;
+            border-left: 2px solid rgba(0, 229, 255, 0.3);
+            padding-left: 16px;
+            margin: 20px 0 22px;
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.03), transparent);
+        }
+
+        /* 社交链接 —— 只保留 GitHub & Email (科幻按钮) */
         .social-links {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 24px;
         }
+
         .social-links a {
             text-decoration: none;
-            color: white;
-            background-color: var(--primary-color);
-            padding: 8px 16px;
-            border-radius: 20px;
+            color: var(--text-primary);
+            background: rgba(0, 229, 255, 0.06);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            padding: 10px 28px;
+            border-radius: 60px;
             font-size: 14px;
-            transition: opacity 0.3s;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .social-links a:hover { opacity: 0.8; }
 
-        /* 模块二：AI 聊天框 */
+        .social-links a:hover {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: #00e5ff;
+            box-shadow: 0 0 30px #00e5ff44, inset 0 0 20px #00e5ff22;
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .social-links a:active {
+            transform: scale(0.96);
+        }
+
+        /* ---------- 模块二：AI 聊天框 (科幻感) ---------- */
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 400px;
+            height: 460px;
+            padding: 28px 24px 24px;
+            background: rgba(10, 12, 28, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.06), inset 0 0 50px rgba(0, 0, 0, 0.5);
         }
+
         .chat-title {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px #00e5ff66;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+
+        .chat-title::before {
+            content: "⟡";
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        /* 聊天记录区域 */
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            padding-right: 5px;
-        }
-        .message {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .msg-ai {
-            background-color: #f0e6ff;
-            color: #4a2b75;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-        .msg-user {
-            background-color: var(--primary-color);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-        .input-area {
-            display: flex;
-            gap: 10px;
-        }
-        .input-area input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-        }
-        .input-area input:focus {
-            border-color: var(--primary-color);
-        }
-        .input-area button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .input-area button:hover {
-            background-color: #835cba;
+            gap: 12px;
+            padding-right: 6px;
+            scroll-behavior: smooth;
         }
 
-        /* 滚动条美化 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d3c4e3; border-radius: 3px; }
+        /* 消息气泡 — 科幻风格 */
+        .message {
+            max-width: 82%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            word-break: break-word;
+        }
+
+        .msg-ai {
+            background: rgba(40, 45, 85, 0.7);
+            color: #d0d9ff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border-left: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+            backdrop-filter: blur(4px);
+        }
+
+        .msg-user {
+            background: linear-gradient(135deg, #2f2f7a, #1b1d4a);
+            color: #f0f3ff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            border-right: 2px solid var(--accent-purple);
+            box-shadow: 0 0 25px rgba(107, 92, 255, 0.2);
+        }
+
+        /* 输入区域 — 未来感 */
+        .input-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            border-radius: 80px;
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            backdrop-filter: blur(8px);
+            transition: border 0.2s;
+        }
+
+        .input-area:focus-within {
+            border-color: #00e5ff;
+            box-shadow: 0 0 30px #00e5ff22;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        .input-area input::placeholder {
+            color: #6a72a0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .input-area button {
+            background: linear-gradient(145deg, #3d3f7a, #26285a);
+            border: none;
+            color: white;
+            padding: 0 26px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            text-shadow: 0 0 10px #6b5cff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+            font-family: var(--font-mono);
+        }
+
+        .input-area button:hover {
+            background: linear-gradient(145deg, #5f5bb0, #3d3f7a);
+            border-color: #00e5ff;
+            box-shadow: 0 0 40px #00e5ff33, inset 0 0 20px #6b5cff44;
+            transform: scale(1.02);
+        }
+
+        .input-area button:active {
+            transform: scale(0.95);
+        }
+
+        /* 自定义滚动条 — 极简科幻 */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6b5cff, #00e5ff);
+            border-radius: 10px;
+            box-shadow: 0 0 20px #6b5cff66;
+        }
+
+        /* 小屏适配 */
+        @media (max-width: 760px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .chat-container {
+                height: 420px;
+            }
+
+            .social-links a {
+                padding: 8px 20px;
+                font-size: 13px;
+            }
+        }
+
+        /* 额外的科幻点缀：glow 脉冲 */
+        @keyframes pulseGlow {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+
+        .avatar::after {
+            content: '';
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00e5ff10, transparent 70%);
+            animation: pulseGlow 3s infinite;
+            pointer-events: none;
+        }
+
+        .avatar {
+            position: relative;
+        }
+
+        /* 精简描述中的微光 */
+        .profile-desc strong {
+            color: #b388ff;
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 模块一：个人基本信息 -->
+    <!-- 模块一：个人基本信息 (科幻版，只留 GitHub & Email) -->
     <div class="card">
         <div class="profile-header">
-            <div class="avatar">头像</div>
-            <h2>你的名字</h2>
-            <p style="color: var(--text-light); margin-top: 10px;">前端开发者 / AI 爱好者 / 终身学习者</p>
+            <div class="avatar">✦</div>
+            <h2>Loyddy</h2>
+            <span class="tagline">✦ 数字边界 ✦</span>
         </div>
-        <div style="line-height: 1.8; color: var(--text-light);">
-            <p>你好！欢迎来到我的主页。我致力于构建优秀的 Web 应用程序。右侧是我的数字分身，如果你想快速了解我，可以直接向它提问！</p>
+
+        <div class="profile-desc">
+            <p>👾 终身学习者 · 构建未来的碎片。<br>
+            欢迎进入我的个人星域。右侧是我的 <strong>AI 分身</strong>，你可以直接向它提问，快速了解我的世界。</p>
         </div>
+
+        <!-- 只保留 GitHub 和 Email，其他社交移除 -->
         <div class="social-links">
-            <a href="https://github.com/你的用户名" target="_blank">GitHub</a>
-            <a href="https://twitter.com/你的用户名" target="_blank">Twitter</a>
-            <a href="mailto:your-email@example.com">Email</a>
+            <a href="https://github.com/Loyddy" target="_blank">
+                <span style="opacity:0.7;">⌨</span> GitHub
+            </a>
+            <a href="mailto:hunshi061226@163.com">
+                <span style="opacity:0.7;">✉</span> Email
+            </a>
         </div>
     </div>
 
-    <!-- 模块二：AI 分身对话框 -->
+    <!-- 模块二：AI 分身对话框 (科幻强化) -->
     <div class="card chat-container">
-        <h3 class="chat-title">✨ 我的 AI 分身</h3>
+        <div class="chat-title">AI 分身 · 量子镜像</div>
         <div class="chat-box" id="chat-box">
-            <div class="message msg-ai">你好！我是主人的 AI 分身，我已经掌握了他的基本信息、技能栈和项目经历。你想了解关于他的什么呢？</div>
+            <div class="message msg-ai">✦ 信号已链接。我是主人的 AI 分身。你想了解关于他的什么？</div>
         </div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="问我任何关于他的问题..." onkeypress="handleEnter(event)">
+            <input type="text" id="user-input" placeholder="输入问题 ... 例如：他的技能？" onkeypress="handleEnter(event)">
             <button onclick="sendMessage()">发送</button>
         </div>
     </div>
 </div>
 
 <script>
+    // 后端地址 (保持不变)
     const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
 
     async function sendMessage() {
@@ -197,7 +430,7 @@
         appendMessage(text, 'user');
         inputField.value = '';
 
-        const loadingId = appendMessage('正在思考中...', 'ai');
+        const loadingId = appendMessage('⟡ 正在处理神经信号 ...', 'ai');
 
         try {
             const response = await fetch(BACKEND_URL, {
@@ -208,23 +441,22 @@
 
             const data = await response.json();
 
-            // 移除 Loading 状态并添加真实回复
             document.getElementById(loadingId).remove();
-            if(data.reply) {
+            if (data.reply) {
                 appendMessage(data.reply, 'ai');
             } else {
-                appendMessage("抱歉，我的大脑暂时断线了，请稍后再试。", 'ai');
+                appendMessage("⚠️ 量子链路波动，请稍后再试。", 'ai');
             }
         } catch (error) {
             document.getElementById(loadingId).remove();
-            appendMessage("网络请求失败，请确保后端服务已启动并配置了跨域(CORS)。", 'ai');
+            appendMessage("❌ 无法连接到 AI 核心，请检查后端服务 (CORS)。", 'ai');
         }
     }
 
     function appendMessage(text, sender) {
         const chatBox = document.getElementById('chat-box');
         const msgDiv = document.createElement('div');
-        const msgId = 'msg-' + Date.now();
+        const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
         msgDiv.id = msgId;
         msgDiv.className = `message msg-${sender}`;
         msgDiv.textContent = text;
@@ -236,6 +468,11 @@
     function handleEnter(event) {
         if (event.key === 'Enter') sendMessage();
     }
+
+    // 可选：自动聚焦输入框
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('user-input').focus();
+    });
 </script>
 
 </body>

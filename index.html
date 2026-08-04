@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sci-Fi Personal Hub · AI Avatar</title>
+    <title>科幻个人中心 · AI 头像</title>
     <style>
-        /* ----- Sci-Fi Reset & Variables ----- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0b0d1a;
             --bg-card: rgba(18, 22, 40, 0.75);
@@ -25,40 +19,32 @@
             --radius-lg: 24px;
             --radius-sm: 14px;
         }
-
         body {
             background: radial-gradient(circle at 20% 30%, #141a2b, #07090f 90%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             font-family: var(--font-mono);
             color: var(--text-primary);
             padding: 24px;
-            backdrop-filter: blur(2px);
             margin: 0;
             position: relative;
             overflow-x: hidden;
             cursor: default;
+            padding-top: 40px;
         }
-
-        /* Dynamic canvas background - fullscreen */
         #bg-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             z-index: 0;
             pointer-events: none;
-            display: block;
         }
-
-        /* Main container */
         .container {
             display: flex;
             gap: 28px;
-            max-width: 1300px;
+            max-width: 1400px;
             width: 100%;
             flex-wrap: wrap;
             position: relative;
@@ -67,8 +53,6 @@
             min-height: 80vh;
             align-items: stretch;
         }
-
-        /* Cards */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
@@ -77,34 +61,38 @@
             padding: 32px 28px;
             border: 1px solid rgba(107, 92, 255, 0.25);
             box-shadow: var(--shadow-glow), inset 0 0 40px rgba(0, 229, 255, 0.03);
-            flex: 1 1 40%;
-            min-width: 340px;
             transition: box-shadow 0.3s ease, border-color 0.3s;
             display: flex;
             flex-direction: column;
         }
-
         .card:hover {
             border-color: rgba(0, 229, 255, 0.5);
             box-shadow: 0 0 45px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.04);
         }
+        .card { min-height: 500px; }
 
-        /* Profile Header */
+        /* ===== 左侧卡片：个人信息 + 仓库列表 ===== */
+        .left-card {
+            flex: 1 1 30%;
+            min-width: 280px;
+            max-width: 380px;
+            justify-content: flex-start;
+            gap: 16px;
+        }
         .profile-header {
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 10px;
         }
-
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
             background: linear-gradient(145deg, #3d3f7a, #1d1f3a);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 600;
             letter-spacing: 2px;
             color: #b388ff;
@@ -115,115 +103,150 @@
             background-image: radial-gradient(circle at 30% 25%, #6b5cff20, transparent 60%);
             position: relative;
         }
-
         .avatar:hover {
             transform: scale(1.03);
             border-color: #00e5ff;
             box-shadow: 0 0 60px #00e5ff55, inset 0 0 50px #6b5cff55;
         }
-
         .avatar::after {
             content: '';
             position: absolute;
-            width: 130px;
-            height: 130px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             background: radial-gradient(circle, #00e5ff10, transparent 70%);
             animation: pulseGlow 3s infinite;
             pointer-events: none;
         }
-
         .profile-header h2 {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 400;
             letter-spacing: 3px;
             background: linear-gradient(135deg, #e8eaff, #b388ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-shadow: 0 0 30px #6b5cff55;
         }
-
         .profile-header .tagline {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 12px;
             letter-spacing: 4px;
             text-transform: uppercase;
             border-top: 1px solid rgba(0, 229, 255, 0.2);
             display: inline-block;
             padding-top: 6px;
-            margin-top: 4px;
+            margin-top: 2px;
         }
-
         .profile-desc {
-            line-height: 1.7;
+            line-height: 1.6;
             color: var(--text-secondary);
-            font-size: 15px;
+            font-size: 14px;
             border-left: 2px solid rgba(0, 229, 255, 0.3);
-            padding-left: 16px;
-            margin: 20px 0 22px;
+            padding-left: 14px;
+            margin: 10px 0 12px;
             background: linear-gradient(90deg, rgba(0, 229, 255, 0.03), transparent);
-            flex: 1;
         }
-
         .profile-desc strong {
             color: #b388ff;
             font-weight: 400;
         }
 
-        .social-links {
+        /* 仓库列表 */
+        .repo-section {
+            margin-top: 6px;
+            flex: 1;
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 24px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            min-height: 0;
         }
-
-        .social-links a {
-            text-decoration: none;
-            color: var(--text-primary);
-            background: rgba(0, 229, 255, 0.06);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            padding: 10px 28px;
-            border-radius: 60px;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            backdrop-filter: blur(8px);
-            transition: all 0.25s ease;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
-            display: inline-flex;
+        .repo-section .section-title {
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            opacity: 0.7;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            display: flex;
             align-items: center;
             gap: 8px;
         }
-
-        .social-links a:hover {
-            background: rgba(0, 229, 255, 0.15);
-            border-color: #00e5ff;
-            box-shadow: 0 0 30px #00e5ff44, inset 0 0 20px #00e5ff22;
-            transform: translateY(-2px);
-            color: #fff;
+        .repo-section .section-title::before {
+            content: "⌨";
+            font-size: 16px;
         }
-
-        .social-links a:active {
-            transform: scale(0.96);
-        }
-
-        /* AI Chat */
-        .chat-container {
+        .repo-list {
             display: flex;
             flex-direction: column;
-            height: 500px;
-            padding: 28px 24px 24px;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: 320px;
+            padding-right: 4px;
+        }
+        .repo-list::-webkit-scrollbar { width: 4px; }
+        .repo-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .repo-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6b5cff, #00e5ff);
+            border-radius: 10px;
+        }
+        .repo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: rgba(0, 229, 255, 0.04);
+            border: 1px solid rgba(0, 229, 255, 0.08);
+            border-radius: 40px;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .repo-item:hover {
+            background: rgba(0, 229, 255, 0.12);
+            border-color: rgba(0, 229, 255, 0.4);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+            transform: translateX(4px);
+        }
+        .repo-item .repo-icon {
+            opacity: 0.5;
+            font-size: 14px;
+        }
+        .repo-item .repo-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .repo-item .repo-arrow {
+            opacity: 0.3;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .repo-item:hover .repo-arrow {
+            opacity: 0.8;
+            transform: translateX(4px);
+        }
+
+        /* ===== 右侧聊天卡片 ===== */
+        .chat-card {
+            flex: 1 1 50%;
+            min-width: 340px;
+            padding: 28px 24px 20px;
             background: rgba(10, 12, 28, 0.6);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 229, 255, 0.2);
             box-shadow: 0 0 40px rgba(0, 229, 255, 0.06), inset 0 0 50px rgba(0, 0, 0, 0.5);
-            flex: 1;
-            min-height: 460px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-
         .chat-title {
             font-size: 18px;
             font-weight: 300;
@@ -232,32 +255,39 @@
             text-shadow: 0 0 20px #00e5ff66;
             border-bottom: 1px solid rgba(0, 229, 255, 0.2);
             padding-bottom: 14px;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
-
         .chat-title::before {
             content: "⟡";
             font-size: 24px;
             opacity: 0.8;
         }
-
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             padding-right: 6px;
             scroll-behavior: smooth;
+            max-height: 380px;
+            min-height: 200px;
         }
-
+        .chat-box::-webkit-scrollbar { width: 5px; }
+        .chat-box::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6b5cff, #00e5ff);
+            border-radius: 10px;
+            box-shadow: 0 0 20px #6b5cff66;
+        }
         .message {
             max-width: 82%;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: 20px;
             font-size: 14px;
             line-height: 1.6;
@@ -266,7 +296,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             word-break: break-word;
         }
-
         .msg-ai {
             background: rgba(40, 45, 85, 0.7);
             color: #d0d9ff;
@@ -274,9 +303,7 @@
             border-bottom-left-radius: 4px;
             border-left: 2px solid var(--accent-cyan);
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
-            backdrop-filter: blur(4px);
         }
-
         .msg-user {
             background: linear-gradient(135deg, #2f2f7a, #1b1d4a);
             color: #f0f3ff;
@@ -286,30 +313,29 @@
             box-shadow: 0 0 25px rgba(107, 92, 255, 0.2);
         }
 
-        /* ===== 修复输入框排版 ===== */
+        /* 输入框放在聊天卡片最底部 */
         .input-area {
             display: flex;
             gap: 8px;
-            margin-top: 6px;
+            margin-top: 4px;
             background: rgba(0, 0, 0, 0.3);
             padding: 4px;
             border-radius: 80px;
             border: 1px solid rgba(0, 229, 255, 0.15);
             backdrop-filter: blur(8px);
             transition: border 0.2s;
-            flex-wrap: nowrap;          /* 强制一行，不换行 */
-            align-items: center;        /* 垂直居中 */
+            flex-wrap: nowrap;
+            align-items: center;
+            flex-shrink: 0;
         }
-
         .input-area:focus-within {
             border-color: #00e5ff;
             box-shadow: 0 0 30px #00e5ff22;
         }
-
         .input-area input {
-            flex: 1 1 auto;            /* 自动伸缩，占据剩余空间 */
-            min-width: 0;              /* 防止溢出 */
-            padding: 14px 18px;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 12px 16px;
             background: transparent;
             border: none;
             outline: none;
@@ -317,24 +343,22 @@
             font-size: 14px;
             font-family: var(--font-mono);
             letter-spacing: 0.5px;
-            width: 100%;               /* 保证宽度自适应 */
+            width: 100%;
         }
-
         .input-area input::placeholder {
             color: #6a72a0;
             font-weight: 300;
             letter-spacing: 1px;
         }
-
         .input-area button {
-            flex: 0 0 auto;            /* 不伸缩，保持按钮宽度 */
+            flex: 0 0 auto;
             background: linear-gradient(145deg, #3d3f7a, #26285a);
             border: none;
             color: white;
-            padding: 0 26px;
+            padding: 0 22px;
             border-radius: 60px;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.25s;
@@ -342,100 +366,30 @@
             text-shadow: 0 0 10px #6b5cff;
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
             font-family: var(--font-mono);
-            white-space: nowrap;        /* 防止按钮文字换行 */
-            height: 48px;               /* 固定高度，与输入框对齐 */
+            white-space: nowrap;
+            height: 44px;
             line-height: 1;
         }
-
         .input-area button:hover {
             background: linear-gradient(145deg, #5f5bb0, #3d3f7a);
             border-color: #00e5ff;
             box-shadow: 0 0 40px #00e5ff33, inset 0 0 20px #6b5cff44;
             transform: scale(1.02);
         }
-
-        .input-area button:active {
-            transform: scale(0.95);
-        }
-
-        /* 重置按钮单独样式，保持与发送按钮一致 */
+        .input-area button:active { transform: scale(0.95); }
         .btn-reset {
             background: rgba(255, 50, 50, 0.15) !important;
             border-color: rgba(255, 50, 50, 0.3) !important;
-            padding: 0 16px !important;
-            font-size: 20px !important;
+            padding: 0 14px !important;
+            font-size: 18px !important;
             text-shadow: none !important;
             flex: 0 0 auto !important;
-            min-width: 48px;
+            min-width: 44px;
         }
-
         .btn-reset:hover {
             background: rgba(255, 50, 50, 0.3) !important;
             border-color: rgba(255, 50, 50, 0.6) !important;
             box-shadow: 0 0 30px rgba(255, 50, 50, 0.2) !important;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #6b5cff, #00e5ff);
-            border-radius: 10px;
-            box-shadow: 0 0 20px #6b5cff66;
-        }
-
-        /* 移动端适配：输入框保持一行，按钮适当缩小 */
-        @media (max-width: 600px) {
-            .input-area {
-                flex-wrap: nowrap;
-                gap: 6px;
-                padding: 4px;
-                border-radius: 60px;
-            }
-            .input-area input {
-                padding: 12px 14px;
-                font-size: 13px;
-                min-width: 0;
-            }
-            .input-area button {
-                padding: 0 14px;
-                font-size: 12px;
-                height: 42px;
-                min-width: 36px;
-            }
-            .btn-reset {
-                padding: 0 10px !important;
-                font-size: 16px !important;
-                min-width: 36px;
-            }
-        }
-
-        @media (max-width: 760px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-                padding: 10px 12px;
-                min-height: 100vh;
-            }
-            .card {
-                min-width: 0;
-                width: 100%;
-                flex: 1 1 auto;
-            }
-            .chat-container {
-                height: 420px;
-                min-height: 360px;
-            }
-            .social-links a {
-                padding: 8px 20px;
-                font-size: 13px;
-            }
         }
 
         @keyframes pulseGlow {
@@ -444,562 +398,202 @@
             100% { opacity: 0.4; }
         }
 
-        .card .profile-desc {
-            flex: 1;
+        @media (max-width: 860px) {
+            .container { flex-direction: column; align-items: center; padding: 10px 12px; }
+            .left-card { max-width: 100%; width: 100%; flex: 1 1 auto; }
+            .chat-card { min-width: 0; width: 100%; flex: 1 1 auto; min-height: 400px; }
+            .repo-list { max-height: 200px; }
         }
-
-        /* ----- Cursor Trail Control (bottom-right) ----- */
-        .cursor-control {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 999;
-            background: rgba(10, 12, 28, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            border-radius: 40px;
-            padding: 12px 20px 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 0 40px rgba(0, 229, 255, 0.08);
-            transition: border-color 0.3s, box-shadow 0.3s;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-            min-width: 180px;
-        }
-
-        .cursor-control:hover {
-            border-color: rgba(0, 229, 255, 0.6);
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.12);
-        }
-
-        .cursor-control label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #b0bbee;
-            font-weight: 300;
-        }
-
-        .cursor-control select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            color: #e8eaff;
-            padding: 6px 12px;
-            border-radius: 60px;
-            font-size: 13px;
-            font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-            outline: none;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            transition: border 0.2s;
-        }
-
-        .cursor-control select:hover,
-        .cursor-control select:focus {
-            border-color: #00e5ff;
-            box-shadow: 0 0 20px #00e5ff22;
-        }
-
-        .cursor-control select option {
-            background: #141a2b;
-            color: #e8eaff;
-        }
-
-        .cursor-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-cyan);
-            box-shadow: 0 0 12px #00e5ff;
-            margin-left: 4px;
-            animation: pulseGlow 2s infinite;
-        }
-
         @media (max-width: 600px) {
-            .cursor-control {
-                bottom: 16px;
-                right: 16px;
-                padding: 10px 16px 10px 18px;
-                font-size: 12px;
-                min-width: 140px;
-                gap: 10px;
-                flex-direction: column;
-                align-items: flex-start;
-                border-radius: 28px;
-            }
+            .input-area { flex-wrap: nowrap; gap: 6px; padding: 4px; border-radius: 60px; }
+            .input-area input { padding: 10px 12px; font-size: 13px; min-width: 0; }
+            .input-area button { padding: 0 14px; font-size: 12px; height: 40px; min-width: 36px; }
+            .btn-reset { padding: 0 10px !important; font-size: 16px !important; min-width: 36px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Dynamic Canvas Background -->
-    <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-    <div class="container">
-        <!-- Module 1: Personal Info -->
-        <div class="card">
-            <div class="profile-header">
-                <div class="avatar">✦</div>
-                <h2>Loyd_Wang</h2>
-                <span class="tagline">Fortune Favors the Sweat</span>
-            </div>
-            <div class="profile-desc">
-                <p>Welcome to my personal star sector. On the right is my <strong>AI avatar</strong> — feel free to ask it anything to quickly explore my world.</p>
-            </div>
-            <div class="social-links">
-                <a href="https://github.com/Loyddy" target="_blank">
-                    <span style="opacity:0.7;">⌨</span> GitHub
-                </a>
-                <a href="mailto:hunshi061226@163.com">
-                    <span style="opacity:0.7;">✉</span> Email
-                </a>
-            </div>
+<div class="container">
+    <!-- 左侧：个人信息 + 仓库列表 -->
+    <div class="card left-card">
+        <div class="profile-header">
+            <div class="avatar">✦</div>
+            <h2>Loyd_Wang</h2>
+            <span class="tagline">Fortune Favors the Sweat</span>
+        </div>
+        <div class="profile-desc">
+            <p>Welcome to my personal introduction page. On the right is my <strong>AI avatar</strong> — feel free to ask it anything to quickly explore my world.</p>
         </div>
 
-        <!-- Module 2: AI Chat -->
-        <div class="card chat-container">
-            <div class="chat-title">AI Avatar</div>
-            <div class="chat-box" id="chat-box">
-                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
-            </div>
-            <!-- 修复后的输入区域 -->
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
-                <button onclick="sendMessage()">send</button>
-                <button class="btn-reset" onclick="resetChat()" title="重置对话">⟳</button>
+        <!-- 仓库列表 - 在此处添加/修改/删除链接，数量自动适应 -->
+        <div class="repo-section">
+            <div class="section-title">Github Repository Links</div>
+            <div class="repo-list" id="repoList">
+                <!-- ⬇️ 在这里添加你的仓库链接，数量不限，会自动排列 -->
+                <a href="https://github.com/Loyddy/MinecraftServerManager" target="_blank" class="repo-item">
+                    <span class="repo-icon">⌨</span>
+                    <span class="repo-name">MinecraftServerManager</span>
+                    <span class="repo-arrow">→</span>
+                </a>
+<!--                <a href="https://github.com/Loyddy/quantum-dot" target="_blank" class="repo-item">-->
+<!--                    <span class="repo-icon">⌨</span>-->
+<!--                    <span class="repo-name">quantum-dot</span>-->
+<!--                    <span class="repo-arrow">→</span>-->
+<!--                </a>-->
+<!--                <a href="https://github.com/Loyddy/neon-shell" target="_blank" class="repo-item">-->
+<!--                    <span class="repo-icon">⌨</span>-->
+<!--                    <span class="repo-name">neon-shell</span>-->
+<!--                    <span class="repo-arrow">→</span>-->
+<!--                </a>-->
+<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
+<!--                    <span class="repo-icon">⌨</span>-->
+<!--                    <span class="repo-name">astro-vibe</span>-->
+<!--                    <span class="repo-arrow">→</span>-->
+<!--                </a>-->
+<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
+<!--                    <span class="repo-icon">⌨</span>-->
+<!--                    <span class="repo-name">astro-vibe</span>-->
+<!--                    <span class="repo-arrow">→</span>-->
+<!--                </a>-->
+<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
+<!--                    <span class="repo-icon">⌨</span>-->
+<!--                    <span class="repo-name">astro-vibe</span>-->
+<!--                    <span class="repo-arrow">→</span>-->
+<!--                </a>-->
+
+                <!-- ⬆️ 以上为示例，你可以随意增删改，数量自动适应 -->
             </div>
         </div>
     </div>
 
-    <!-- Cursor Trail Control (bottom-right) -->
-    <div class="cursor-control" id="cursorControl">
-        <label>
-            <span>✦ Trail</span>
-            <select id="trailPreset">
-                <option value="none">Off</option>
-                <option value="neon" selected>Neon</option>
-                <option value="cyber">Cyber</option>
-                <option value="ghost">Ghost</option>
-                <option value="flow">Flow</option>
-                <option value="pulse">Pulse</option>
-                <option value="stardust">Stardust</option>
-            </select>
-            <span class="cursor-indicator"></span>
-        </label>
+    <!-- 右侧AI聊天 -->
+    <div class="card chat-card">
+        <div class="chat-title">AI Avatar</div>
+        <div class="chat-box" id="chat-box">
+            <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
+        </div>
+        <!-- 输入框放在聊天卡片最底部 -->
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()">send</button>
+            <button class="btn-reset" onclick="resetChat()" title="重置对话">⟳</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        // ---------- Dynamic Sci-Fi Background (Particles + Nebula) ----------
-        (function initBackground() {
-            const canvas = document.getElementById('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
-            const PARTICLE_COUNT = 160;
-            const MAX_SPEED = 0.25;
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
+<script>
+    // ========== 背景粒子 ==========
+    (function bg() {
+        const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
+        let W, H, pts = [];
+        const N = 160;
+        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        class P {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * W; this.y = Math.random() * H;
+                this.s = Math.random() * 2.2 + 0.6;
+                this.vx = (Math.random() - 0.5) * 0.45;
+                this.vy = (Math.random() - 0.5) * 0.45;
+                this.o = Math.random() * 0.6 + 0.2;
+                this.c = `hsla(${220 + Math.random() * 60}, 80%, 70%, ${this.o})`;
             }
-            window.addEventListener('resize', resize);
-            resize();
-
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-                reset() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.size = Math.random() * 2.2 + 0.6;
-                    this.speedX = (Math.random() - 0.5) * MAX_SPEED * 1.8;
-                    this.speedY = (Math.random() - 0.5) * MAX_SPEED * 1.8;
-                    this.opacity = Math.random() * 0.6 + 0.2;
-                    this.color = `hsla(${220 + Math.random() * 60}, 80%, 70%, ${this.opacity})`;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > width) { this.speedX *= -1; this.x += this.speedX * 2; }
-                    if (this.y < 0 || this.y > height) { this.speedY *= -1; this.y += this.speedY * 2; }
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.shadowColor = '#6b5cff';
-                    ctx.shadowBlur = 18;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > W) { this.vx *= -1; this.x += this.vx * 2; }
+                if (this.y < 0 || this.y > H) { this.vy *= -1; this.y += this.vy * 2; }
             }
-
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push(new Particle());
-            }
-
-            let timeOffset = 0;
-
-            function drawNebula() {
-                const gradient1 = ctx.createRadialGradient(
-                    width * 0.2 + Math.sin(timeOffset * 0.0003) * 80,
-                    height * 0.3 + Math.cos(timeOffset * 0.0005) * 60,
-                    10,
-                    width * 0.2 + Math.sin(timeOffset * 0.0003) * 80,
-                    height * 0.3 + Math.cos(timeOffset * 0.0005) * 60,
-                    350
-                );
-                gradient1.addColorStop(0, 'rgba(90, 60, 255, 0.08)');
-                gradient1.addColorStop(0.5, 'rgba(0, 200, 255, 0.04)');
-                gradient1.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = gradient1;
-                ctx.fillRect(0, 0, width, height);
-
-                const gradient2 = ctx.createRadialGradient(
-                    width * 0.8 + Math.cos(timeOffset * 0.0004) * 70,
-                    height * 0.7 + Math.sin(timeOffset * 0.0006) * 50,
-                    20,
-                    width * 0.8 + Math.cos(timeOffset * 0.0004) * 70,
-                    height * 0.7 + Math.sin(timeOffset * 0.0006) * 50,
-                    400
-                );
-                gradient2.addColorStop(0, 'rgba(180, 70, 255, 0.06)');
-                gradient2.addColorStop(0.6, 'rgba(0, 150, 255, 0.03)');
-                gradient2.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = gradient2;
-                ctx.fillRect(0, 0, width, height);
-            }
-
-            function drawLines() {
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 140) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            const alpha = (1 - dist / 140) * 0.25;
-                            ctx.strokeStyle = `rgba(120, 160, 255, ${alpha})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.shadowBlur = 8;
-                            ctx.shadowColor = '#6b5cff';
-                            ctx.stroke();
-                            ctx.shadowBlur = 0;
-                        }
-                    }
-                }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = 'rgba(7, 9, 15, 0.3)';
-                ctx.fillRect(0, 0, width, height);
-                timeOffset += 1;
-                drawNebula();
-                for (let p of particles) {
-                    p.update();
-                    p.draw();
-                }
-                drawLines();
-                requestAnimationFrame(animate);
-            }
-            animate();
-        })();
-
-        // ---------- AI Chat Logic (带记忆) ----------
-        const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
-
-        // ===== 维护对话历史 =====
-        let chatHistory = [];
-        const MAX_HISTORY = 20; // 最多保存20轮对话
-
-        // ===== 发送消息 =====
-        async function sendMessage() {
-            const inputField = document.getElementById('user-input');
-            const text = inputField.value.trim();
-            if (!text) return;
-
-            // 添加用户消息到界面
-            appendMessage(text, 'user');
-            // 添加到历史记录
-            chatHistory.push({ role: "user", content: text });
-
-            inputField.value = '';
-            const loadingId = appendMessage('⟡ Processing neural signal ...', 'ai');
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: text,
-                        history: chatHistory  // 发送完整历史
-                    })
-                });
-                const data = await response.json();
-                document.getElementById(loadingId).remove();
-
-                if (data.reply) {
-                    appendMessage(data.reply, 'ai');
-                    // 添加AI回复到历史记录
-                    chatHistory.push({ role: "assistant", content: data.reply });
-
-                    // 限制历史长度
-                    if (chatHistory.length > MAX_HISTORY * 2) {
-                        chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
-                    }
-                } else {
-                    appendMessage("⚠️ Quantum link fluctuation, please retry.", 'ai');
-                }
-            } catch (error) {
-                document.getElementById(loadingId).remove();
-                appendMessage("❌ Connection lost. Check your quantum bridge.", 'ai');
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                ctx.fillStyle = this.c; ctx.shadowColor = '#6b5cff'; ctx.shadowBlur = 18; ctx.fill(); ctx.shadowBlur = 0;
             }
         }
-
-        // ===== 添加消息到界面 =====
-        function appendMessage(text, sender) {
-            const chatBox = document.getElementById('chat-box');
-            const msgDiv = document.createElement('div');
-            const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-            msgDiv.id = msgId;
-            msgDiv.className = `message msg-${sender}`;
-            msgDiv.textContent = text;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return msgId;
-        }
-
-        // ===== 重置对话 =====
-        function resetChat() {
-            if (chatHistory.length > 0 && !confirm('确定要重置对话吗？')) {
-                return;
-            }
-            chatHistory = [];
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = `
-                <div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him? (you can use any language you want)</div>
-            `;
-            document.getElementById('user-input').focus();
-        }
-
-        // ===== 回车发送 =====
-        function handleEnter(event) {
-            if (event.key === 'Enter') sendMessage();
-        }
-
-        // ===== 页面加载 =====
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('user-input').focus();
-        });
-
-        // ---------- Cursor Trail Effect (Enhanced) ----------
-        (function initTrail() {
-            const trailCanvas = document.createElement('canvas');
-            trailCanvas.id = 'trail-canvas';
-            trailCanvas.style.position = 'fixed';
-            trailCanvas.style.top = '0';
-            trailCanvas.style.left = '0';
-            trailCanvas.style.width = '100vw';
-            trailCanvas.style.height = '100vh';
-            trailCanvas.style.pointerEvents = 'none';
-            trailCanvas.style.zIndex = '9999';
-            document.body.appendChild(trailCanvas);
-
-            const ctx = trailCanvas.getContext('2d');
-            let w, h;
-
-            function resizeTrail() {
-                w = trailCanvas.width = window.innerWidth;
-                h = trailCanvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resizeTrail);
-            resizeTrail();
-
-            let points = [];
-            const MAX_POINTS = 45;
-            let currentPreset = 'neon';
-            let time = 0;
-
-            const presets = {
-                none: { size: 0, alpha: 0, color: 'rgba(0,0,0,0)', blur: 0, gap: 0, shape: 'line' },
-                neon: { size: 5, alpha: 0.6, color: '0, 229, 255', blur: 22, gap: 2, shape: 'line' },
-                cyber: { size: 7, alpha: 0.7, color: '179, 136, 255', blur: 28, gap: 3, shape: 'line' },
-                ghost: { size: 11, alpha: 0.25, color: '200, 220, 255', blur: 40, gap: 4, shape: 'line' },
-                flow: { size: 6, alpha: 0.5, color: '255, 100, 180', blur: 30, gap: 1, shape: 'wave' },
-                pulse: { size: 9, alpha: 0.6, color: '255, 200, 50', blur: 35, gap: 2, shape: 'dot' },
-                stardust: { size: 4, alpha: 0.7, color: '150, 200, 255', blur: 18, gap: 0, shape: 'star' }
-            };
-
-            function getPreset(name) {
-                return presets[name] || presets.neon;
-            }
-
-            function addPoint(x, y) {
-                const preset = getPreset(currentPreset);
-                if (preset.size === 0) {
-                    points = [];
-                    return;
+        for (let i = 0; i < N; i++) pts.push(new P());
+        let t = 0;
+        function anim() {
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = 'rgba(7, 9, 15, 0.3)'; ctx.fillRect(0, 0, W, H);
+            t++;
+            const g1 = ctx.createRadialGradient(W*0.2+Math.sin(t*0.0003)*80, H*0.3+Math.cos(t*0.0005)*60, 10, W*0.2+Math.sin(t*0.0003)*80, H*0.3+Math.cos(t*0.0005)*60, 350);
+            g1.addColorStop(0,'rgba(90,60,255,0.08)'); g1.addColorStop(0.5,'rgba(0,200,255,0.04)'); g1.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+            const g2 = ctx.createRadialGradient(W*0.8+Math.cos(t*0.0004)*70, H*0.7+Math.sin(t*0.0006)*50, 20, W*0.8+Math.cos(t*0.0004)*70, H*0.7+Math.sin(t*0.0006)*50, 400);
+            g2.addColorStop(0,'rgba(180,70,255,0.06)'); g2.addColorStop(0.6,'rgba(0,150,255,0.03)'); g2.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+            for (let p of pts) { p.update(); p.draw(); }
+            for (let i=0; i<pts.length; i++) for (let j=i+1; j<pts.length; j++) {
+                const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 140) {
+                    ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+                    ctx.strokeStyle = `rgba(120,160,255,${(1 - dist/140)*0.25})`;
+                    ctx.lineWidth = 0.6; ctx.shadowBlur = 8; ctx.shadowColor = '#6b5cff'; ctx.stroke(); ctx.shadowBlur = 0;
                 }
-                if (points.length > 0) {
-                    const last = points[points.length - 1];
-                    const dx = x - last.x;
-                    const dy = y - last.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < preset.gap + 1) return;
-                }
-                points.push({ x, y, life: 1.0, offset: Math.random() * Math.PI * 2 });
-                if (points.length > MAX_POINTS) points.shift();
             }
+            requestAnimationFrame(anim);
+        }
+        anim();
+    })();
 
-            document.addEventListener('mousemove', (e) => {
-                addPoint(e.clientX, e.clientY);
+    // ========== AI 聊天 ==========
+    const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
+    let chatHistory = [];
+    const MAX_HISTORY = 20;
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        if (!text) return;
+        appendMessage(text, 'user');
+        chatHistory.push({ role: "user", content: text });
+        input.value = '';
+        const loadingId = appendMessage('⟡ Processing neural signal ...', 'ai');
+        try {
+            const res = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: chatHistory })
             });
-
-            document.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                if (touch) addPoint(touch.clientX, touch.clientY);
-            }, { passive: true });
-
-            const select = document.getElementById('trailPreset');
-            select.addEventListener('change', () => {
-                currentPreset = select.value;
-                if (currentPreset === 'none') {
-                    points = [];
-                }
-            });
-
-            function drawShape(ctx, x, y, size, alpha, preset, life) {
-                const shape = preset.shape || 'line';
-                const color = preset.color;
-                const blur = preset.blur * life;
-                ctx.shadowColor = `rgba(${color}, ${alpha * 0.6})`;
-                ctx.shadowBlur = blur;
-
-                switch (shape) {
-                    case 'dot':
-                        ctx.beginPath();
-                        ctx.arc(x, y, size * 0.6 * life, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.7})`;
-                        ctx.fill();
-                        break;
-                    case 'star':
-                        const spikes = 5;
-                        const outerRadius = size * 0.7 * life;
-                        const innerRadius = outerRadius * 0.4;
-                        ctx.beginPath();
-                        for (let i = 0; i < spikes * 2; i++) {
-                            const radius = i % 2 === 0 ? outerRadius : innerRadius;
-                            const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
-                            const cx = x + Math.cos(angle) * radius;
-                            const cy = y + Math.sin(angle) * radius;
-                            if (i === 0) ctx.moveTo(cx, cy);
-                            else ctx.lineTo(cx, cy);
-                        }
-                        ctx.closePath();
-                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.6})`;
-                        ctx.fill();
-                        break;
-                    case 'wave':
-                        const waveSize = size * 0.8 * life;
-                        ctx.beginPath();
-                        for (let i = 0; i < 12; i++) {
-                            const angle = (i / 12) * Math.PI * 2 + time * 0.05;
-                            const r = waveSize * (0.8 + 0.2 * Math.sin(angle * 3 + time * 0.1));
-                            const px = x + Math.cos(angle) * r;
-                            const py = y + Math.sin(angle) * r;
-                            if (i === 0) ctx.moveTo(px, py);
-                            else ctx.lineTo(px, py);
-                        }
-                        ctx.closePath();
-                        ctx.fillStyle = `rgba(${color}, ${alpha * 0.4})`;
-                        ctx.fill();
-                        ctx.strokeStyle = `rgba(${color}, ${alpha * 0.5})`;
-                        ctx.lineWidth = 1.2;
-                        ctx.stroke();
-                        break;
-                    default:
-                        break;
-                }
-                ctx.shadowBlur = 0;
+            const data = await res.json();
+            document.getElementById(loadingId).remove();
+            if (data.reply) {
+                appendMessage(data.reply, 'ai');
+                chatHistory.push({ role: "assistant", content: data.reply });
+                if (chatHistory.length > MAX_HISTORY * 2) chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
+            } else {
+                appendMessage("⚠️ Quantum link fluctuation, please retry.", 'ai');
             }
+        } catch {
+            document.getElementById(loadingId).remove();
+            appendMessage("❌ Connection lost. Check your quantum bridge.", 'ai');
+        }
+    }
 
-            function drawTrail() {
-                ctx.clearRect(0, 0, w, h);
-                time += 1;
+    function appendMessage(text, sender) {
+        const box = document.getElementById('chat-box');
+        const id = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+        const div = document.createElement('div');
+        div.id = id; div.className = `message msg-${sender}`; div.textContent = text;
+        box.appendChild(div); box.scrollTop = box.scrollHeight;
+        return id;
+    }
 
-                const preset = getPreset(currentPreset);
-                if (preset.size === 0 || points.length < 2) {
-                    requestAnimationFrame(drawTrail);
-                    return;
-                }
+    function resetChat() {
+        if (chatHistory.length > 0 && !confirm('确定要重置对话吗？')) return;
+        chatHistory = [];
+        document.getElementById('chat-box').innerHTML = `<div class="message msg-ai">Signal acquired. I am Master's quantum echo. What would you like to decrypt about him? (you can use any language you want)</div>`;
+        document.getElementById('user-input').focus();
+    }
 
-                for (let i = 0; i < points.length; i++) {
-                    points[i].life -= 0.012;
-                }
-                points = points.filter(p => p.life > 0);
+    function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-                if (points.length < 2) {
-                    requestAnimationFrame(drawTrail);
-                    return;
-                }
+    document.addEventListener('DOMContentLoaded', () => document.getElementById('user-input').focus());
 
-                if (preset.shape === 'line' || preset.shape === 'wave' || preset.shape === 'star' || preset.shape === 'dot') {
-                    for (let i = 0; i < points.length - 1; i++) {
-                        const p1 = points[i];
-                        const p2 = points[i + 1];
-                        const life = (p1.life + p2.life) / 2;
-                        const alpha = life * preset.alpha;
-                        const size = preset.size * (0.3 + 0.7 * life);
-
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(${preset.color}, ${alpha})`;
-                        ctx.lineWidth = size;
-                        ctx.lineCap = 'round';
-                        ctx.shadowColor = `rgba(${preset.color}, ${alpha * 0.6})`;
-                        ctx.shadowBlur = preset.blur * life;
-                        ctx.stroke();
-                        ctx.shadowBlur = 0;
-                    }
-                }
-
-                if (preset.shape !== 'line') {
-                    for (let p of points) {
-                        const alpha = p.life * preset.alpha;
-                        const size = preset.size * (0.2 + 0.8 * p.life);
-                        drawShape(ctx, p.x, p.y, size, alpha, preset, p.life);
-                    }
-                } else {
-                    const last = points[points.length - 1];
-                    if (last) {
-                        const alpha = last.life * preset.alpha;
-                        ctx.beginPath();
-                        ctx.arc(last.x, last.y, preset.size * 0.5 * last.life, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(${preset.color}, ${alpha * 0.5})`;
-                        ctx.shadowColor = `rgba(${preset.color}, ${alpha * 0.8})`;
-                        ctx.shadowBlur = preset.blur * 1.2;
-                        ctx.fill();
-                        ctx.shadowBlur = 0;
-                    }
-                }
-
-                requestAnimationFrame(drawTrail);
-            }
-
-            drawTrail();
-        })();
-    </script>
+    // ========== 仓库列表自适应：无需额外逻辑，直接使用HTML中已有的元素 ==========
+    // 所有在 #repoList 下的 .repo-item 都会自动显示，数量完全由HTML决定
+</script>
 </body>
 </html>

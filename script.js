@@ -82,57 +82,117 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 3. AI 对话逻辑
+// 3. AI 对话逻辑 (已彻底修复并优化)
 let chatHistory = [];
+let isSending = false; // 发送状态锁，防止并发发送
+
 async function sendMessage() {
+    if (isSending) return; // 请求处理中则禁止再次触发
+
     const input = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
     const text = input.value.trim();
     if (!text) return;
-    appendMessage(text, 'user');
-    chatHistory.push({ role: "user", content: text });
+
+    // 进入发送状态：加锁 & 禁用输入与按钮
+    isSending = true;
     input.value = '';
+    input.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
+
+    // 1. 显示用户发送的消息
+    appendMessage(text, 'user');
+
+    // 2. 显示 Loading 状态占位卡片
     const loadingId = appendMessage('⟡ Processing...', 'ai');
+
     try {
         const res = await fetch(CHAT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text, history: chatHistory })
         });
+
+        // 收到回复后，安全删除 Loading 占位节点
+        removeMessage(loadingId);
+
+        if (!res.ok) throw new Error(`HTTP Error status: ${res.status}`);
+
         const data = await res.json();
-        document.getElementById(loadingId).remove();
+
         if (data.reply) {
             appendMessage(data.reply, 'ai');
+            // 响应成功后再同步推入对话历史，保证上下文完整
+            chatHistory.push({ role: "user", content: text });
             chatHistory.push({ role: "assistant", content: data.reply });
         } else {
             appendMessage("⚠️ Error fetching reply.", 'ai');
         }
-    } catch {
-        document.getElementById(loadingId).remove();
+    } catch (err) {
+        console.error("Chat request failed:", err);
+        removeMessage(loadingId);
         appendMessage("❌ Connection lost.", 'ai');
+    } finally {
+        // 恢复可用状态
+        isSending = false;
+        input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        input.focus();
     }
 }
 
 function appendMessage(text, sender) {
     const box = document.getElementById('chat-box');
-    const id = 'msg-' + Date.now();
+    const id = 'msg-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     const div = document.createElement('div');
     div.id = id;
     div.className = `message msg-${sender}`;
+
     if (sender === 'ai' && typeof marked !== 'undefined') {
         div.innerHTML = marked.parse(text);
     } else {
         div.textContent = text;
     }
+
     box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+
+    // 确保 Markdown / 节点完成构建后再平滑滚动到底部
+    setTimeout(() => {
+        box.scrollTop = box.scrollHeight;
+    }, 20);
+
     return id;
+}
+
+// 安全移除 DOM 节点 (防 null 报错)
+function removeMessage(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
 function resetChat() {
     chatHistory = [];
-    document.getElementById('chat-box').innerHTML = `<div class="message msg-ai">Signal acquired. I am Master's quantum echo. Ask me anything.</div>`;
+    isSending = false;
+    const input = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    if (input) {
+        input.disabled = false;
+        input.value = '';
+    }
+    if (sendBtn) sendBtn.disabled = false;
+
+    document.getElementById('chat-box').innerHTML = `
+        <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
+    `;
 }
 
-function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+// 监听键盘按键：修复中文输入法回车选词误发的 Bug
+function handleEnter(e) {
+    if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        sendMessage();
+    }
+}
 
 window.addEventListener('DOMContentLoaded', loadPortfolioData);

@@ -35,15 +35,15 @@
         </div>
     </div>
 
-    <!-- 右侧 AI 聊天卡片 --> 
+    <!-- 右侧 AI 聊天卡片 -->
     <div class="card chat-card">
         <div class="chat-title">AI Avatar</div>
         <div class="chat-box" id="chat-box">
             <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
         </div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
-            <button onclick="sendMessage()">send</button>
+            <input type="text" id="user-input" placeholder="ask anything about me..." onkeydown="handleEnter(event)">
+            <button id="send-btn" onclick="sendMessage()">send</button>
             <button class="btn-reset" onclick="resetChat()" title="重置对话">⟳</button>
         </div>
     </div>

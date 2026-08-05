@@ -13,7 +13,7 @@
 }
 body {
     background: radial-gradient(circle at 20% 30%, #141a2b, #07090f 90%);
-    min-height: 120vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,7 +21,7 @@ body {
     color: var(--text-primary);
     padding: 24px;
     padding-top: 40px;
-    padding-bottom: 120px;
+    padding-bottom: 40px;
     overflow-x: hidden;
 }
 #bg-canvas {
@@ -33,15 +33,66 @@ body {
 }
 .container {
     display: flex;
-    gap: 28px;
+    gap: 20px;
     max-width: 1400px;
     width: 100%;
     flex-wrap: wrap;
     position: relative;
     z-index: 10;
-    padding: 20px 30px;
-    margin-bottom: 40px;
+    padding: 20px 0;
 }
+
+/* ==================== 左侧窄边栏 (新增) ==================== */
+.social-sidebar {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg);
+    padding: 20px 12px;
+    border: 1px solid rgba(107, 92, 255, 0.25);
+    box-shadow: var(--shadow-glow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    transition: 0.3s;
+    height: fit-content; /* 使其高度自适应图标数量并与顶部对齐 */
+}
+
+.social-sidebar:hover {
+    border-color: rgba(0, 229, 255, 0.5);
+    box-shadow: 0 0 45px rgba(0, 229, 255, 0.2);
+}
+
+.sidebar-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.04);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.sidebar-icon-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transition: fill 0.3s ease;
+}
+
+.sidebar-icon-btn:hover {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+}
+
+/* ==================== 主卡片样式 ==================== */
 .card {
     background: var(--bg-card);
     backdrop-filter: blur(12px);
@@ -57,7 +108,7 @@ body {
     border-color: rgba(0, 229, 255, 0.5);
     box-shadow: 0 0 45px rgba(0, 229, 255, 0.2);
 }
-.left-card { flex: 1 1 35%; min-width: 300px; max-width: 420px; gap: 20px; }
+.left-card { flex: 1 1 32%; min-width: 300px; max-width: 420px; gap: 20px; }
 .profile-header { text-align: center; }
 .avatar {
     width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 12px;
@@ -79,7 +130,7 @@ body {
 .tree-container ul { list-style: none; padding-left: 18px; border-left: 1px dashed rgba(107, 92, 255, 0.3); margin: 4px 0; }
 .tree-container li { margin: 4px 0; color: #d0d9ff; }
 
-/* ==================== Featured Projects 专属滚动条样式 ==================== */
+/* 项目列表滚动条 */
 .repo-list {
     display: flex;
     flex-direction: column;
@@ -108,7 +159,7 @@ body {
 .repo-card-title { display: flex; justify-content: space-between; font-size: 13px; color: var(--accent-cyan); }
 .repo-card-desc { font-size: 11px; opacity: 0.75; }
 
-/* ==================== AI 聊天卡片 ==================== */
+/* AI 聊天卡片 */
 .chat-card {
     flex: 1 1 50%;
     min-width: 340px;
@@ -143,17 +194,16 @@ body {
 .input-area button { background: linear-gradient(145deg, #3d3f7a, #26285a); border: 1px solid rgba(0, 229, 255, 0.2); color: white; padding: 0 22px; border-radius: 60px; cursor: pointer; transition: 0.2s; }
 .btn-reset { background: rgba(255, 50, 50, 0.15) !important; border-color: rgba(255, 50, 50, 0.3) !important; padding: 0 14px !important; }
 
-/* 输入框及按钮禁用状态样式 */
 .input-area input:disabled,
 .input-area button:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-/* 底部栏 */
-.social-footer-container { position: fixed; bottom: 0; left: 0; width: 100vw; padding: 15px; display: flex; justify-content: center; pointer-events: none; }
-.social-footer-card { pointer-events: auto; background: rgba(14, 18, 34, 0.85); border-radius: var(--radius-lg); padding: 14px 28px; border: 1px solid rgba(107, 92, 255, 0.35); display: flex; gap: 16px; }
-.social-btn { padding: 8px 18px; background: rgba(0, 229, 255, 0.04); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 40px; color: var(--text-secondary); text-decoration: none; font-size: 13px; }
-.social-btn:hover { background: rgba(0, 229, 255, 0.12); color: #fff; }
-
-@media (max-width: 860px) { .container { flex-direction: column; } .left-card, .chat-card { width: 100%; max-width: 100%; } #bg-canvas { display: none; } }
+/* 响应式支持 */
+@media (max-width: 860px) {
+    .container { flex-direction: column; }
+    .social-sidebar { flex-direction: row; justify-content: center; width: 100%; }
+    .left-card, .chat-card { width: 100%; max-width: 100%; }
+    #bg-canvas { display: none; }
+}

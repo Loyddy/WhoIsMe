@@ -64,12 +64,12 @@
             transition: box-shadow 0.3s ease, border-color 0.3s;
             display: flex;
             flex-direction: column;
+            min-height: 500px;
         }
         .card:hover {
             border-color: rgba(0, 229, 255, 0.5);
             box-shadow: 0 0 45px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.04);
         }
-        .card { min-height: 500px; }
 
         /* ===== 左侧卡片：个人信息 + 仓库列表 ===== */
         .left-card {
@@ -186,6 +186,7 @@
             flex: 1;
             max-height: 320px;
             padding-right: 4px;
+            -webkit-overflow-scrolling: touch; /* 提升手机端滚动流畅度 */
         }
         .repo-list::-webkit-scrollbar { width: 4px; }
         .repo-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
@@ -229,10 +230,6 @@
             font-size: 12px;
             transition: 0.2s;
         }
-        .repo-item:hover .repo-arrow {
-            opacity: 0.8;
-            transform: translateX(4px);
-        }
 
         /* ===== 右侧聊天卡片 ===== */
         .chat-card {
@@ -241,6 +238,7 @@
             padding: 28px 24px 20px;
             background: rgba(10, 12, 28, 0.6);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 229, 255, 0.2);
             box-shadow: 0 0 40px rgba(0, 229, 255, 0.06), inset 0 0 50px rgba(0, 0, 0, 0.5);
             display: flex;
@@ -277,6 +275,7 @@
             scroll-behavior: smooth;
             max-height: 380px;
             min-height: 200px;
+            -webkit-overflow-scrolling: touch; /* 提升手机端滚动流畅度 */
         }
         .chat-box::-webkit-scrollbar { width: 5px; }
         .chat-box::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
@@ -292,7 +291,6 @@
             font-size: 14px;
             line-height: 1.6;
             letter-spacing: 0.3px;
-            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             word-break: break-word;
         }
@@ -322,7 +320,6 @@
             padding: 4px;
             border-radius: 80px;
             border: 1px solid rgba(0, 229, 255, 0.15);
-            backdrop-filter: blur(8px);
             transition: border 0.2s;
             flex-wrap: nowrap;
             align-items: center;
@@ -386,11 +383,6 @@
             flex: 0 0 auto !important;
             min-width: 44px;
         }
-        .btn-reset:hover {
-            background: rgba(255, 50, 50, 0.3) !important;
-            border-color: rgba(255, 50, 50, 0.6) !important;
-            box-shadow: 0 0 30px rgba(255, 50, 50, 0.2) !important;
-        }
 
         @keyframes pulseGlow {
             0% { opacity: 0.4; }
@@ -398,15 +390,24 @@
             100% { opacity: 0.4; }
         }
 
+        /* 移动端专属性能优化：取消高开销模糊和重阴影 */
         @media (max-width: 860px) {
-            .container { flex-direction: column; align-items: center; padding: 10px 12px; }
-            .left-card { max-width: 100%; width: 100%; flex: 1 1 auto; }
-            .chat-card { min-width: 0; width: 100%; flex: 1 1 auto; min-height: 400px; }
-            .repo-list { max-height: 200px; }
+            body { padding: 12px; padding-top: 20px; }
+            .container { flex-direction: column; align-items: center; padding: 5px; gap: 16px; }
+            .left-card, .chat-card { max-width: 100%; width: 100%; min-height: auto; }
+            .chat-card { min-height: 380px; }
+            .repo-list { max-height: 160px; }
+
+            /* 关闭或降低移动端毛玻璃与多层阴影以防卡顿 */
+            .card, .chat-card, .input-area {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                background: rgba(14, 18, 34, 0.92);
+            }
         }
         @media (max-width: 600px) {
-            .input-area { flex-wrap: nowrap; gap: 6px; padding: 4px; border-radius: 60px; }
-            .input-area input { padding: 10px 12px; font-size: 13px; min-width: 0; }
+            .input-area { gap: 6px; padding: 4px; border-radius: 60px; }
+            .input-area input { padding: 10px 12px; font-size: 13px; }
             .input-area button { padding: 0 14px; font-size: 12px; height: 40px; min-width: 36px; }
             .btn-reset { padding: 0 10px !important; font-size: 16px !important; min-width: 36px; }
         }
@@ -428,43 +429,14 @@
             <p>Welcome to my personal introduction page. On the right is my <strong>AI avatar</strong> — feel free to ask it anything to quickly explore my world.</p>
         </div>
 
-        <!-- 仓库列表 - 在此处添加/修改/删除链接，数量自动适应 -->
         <div class="repo-section">
             <div class="section-title">Github Repository Links</div>
             <div class="repo-list" id="repoList">
-                <!-- ⬇️ 在这里添加你的仓库链接，数量不限，会自动排列 -->
                 <a href="https://github.com/Loyddy/MinecraftServerManager" target="_blank" class="repo-item">
                     <span class="repo-icon">⌨</span>
                     <span class="repo-name">MinecraftServerManager</span>
                     <span class="repo-arrow">→</span>
                 </a>
-<!--                <a href="https://github.com/Loyddy/quantum-dot" target="_blank" class="repo-item">-->
-<!--                    <span class="repo-icon">⌨</span>-->
-<!--                    <span class="repo-name">quantum-dot</span>-->
-<!--                    <span class="repo-arrow">→</span>-->
-<!--                </a>-->
-<!--                <a href="https://github.com/Loyddy/neon-shell" target="_blank" class="repo-item">-->
-<!--                    <span class="repo-icon">⌨</span>-->
-<!--                    <span class="repo-name">neon-shell</span>-->
-<!--                    <span class="repo-arrow">→</span>-->
-<!--                </a>-->
-<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
-<!--                    <span class="repo-icon">⌨</span>-->
-<!--                    <span class="repo-name">astro-vibe</span>-->
-<!--                    <span class="repo-arrow">→</span>-->
-<!--                </a>-->
-<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
-<!--                    <span class="repo-icon">⌨</span>-->
-<!--                    <span class="repo-name">astro-vibe</span>-->
-<!--                    <span class="repo-arrow">→</span>-->
-<!--                </a>-->
-<!--                <a href="https://github.com/Loyddy/astro-vibe" target="_blank" class="repo-item">-->
-<!--                    <span class="repo-icon">⌨</span>-->
-<!--                    <span class="repo-name">astro-vibe</span>-->
-<!--                    <span class="repo-arrow">→</span>-->
-<!--                </a>-->
-
-                <!-- ⬆️ 以上为示例，你可以随意增删改，数量自动适应 -->
             </div>
         </div>
     </div>
@@ -475,7 +447,6 @@
         <div class="chat-box" id="chat-box">
             <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
         </div>
-        <!-- 输入框放在聊天卡片最底部 -->
         <div class="input-area">
             <input type="text" id="user-input" placeholder="ask anything about me..." onkeypress="handleEnter(event)">
             <button onclick="sendMessage()">send</button>
@@ -485,13 +456,18 @@
 </div>
 
 <script>
-    // ========== 背景粒子 ==========
+    // ========== 背景粒子（已做移动端性能优化） ==========
     (function bg() {
         const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
         let W, H, pts = [];
-        const N = 160;
+
+        // 检测是否为移动端设备，自适应动态调整粒子数量
+        const isMobile = window.innerWidth <= 860;
+        const N = isMobile ? 35 : 120; // 移动端大幅减少粒子数以保障流畅度
+
         function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
+
         class P {
             constructor() { this.reset(); }
             reset() {
@@ -509,7 +485,13 @@
             }
             draw() {
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
-                ctx.fillStyle = this.c; ctx.shadowColor = '#6b5cff'; ctx.shadowBlur = 18; ctx.fill(); ctx.shadowBlur = 0;
+                ctx.fillStyle = this.c;
+                // 移动端跳过阴影以提升性能
+                if (!isMobile) {
+                    ctx.shadowColor = '#6b5cff'; ctx.shadowBlur = 18;
+                }
+                ctx.fill();
+                if (!isMobile) ctx.shadowBlur = 0;
             }
         }
         for (let i = 0; i < N; i++) pts.push(new P());
@@ -518,19 +500,18 @@
             ctx.clearRect(0, 0, W, H);
             ctx.fillStyle = 'rgba(7, 9, 15, 0.3)'; ctx.fillRect(0, 0, W, H);
             t++;
-            const g1 = ctx.createRadialGradient(W*0.2+Math.sin(t*0.0003)*80, H*0.3+Math.cos(t*0.0005)*60, 10, W*0.2+Math.sin(t*0.0003)*80, H*0.3+Math.cos(t*0.0005)*60, 350);
-            g1.addColorStop(0,'rgba(90,60,255,0.08)'); g1.addColorStop(0.5,'rgba(0,200,255,0.04)'); g1.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
-            const g2 = ctx.createRadialGradient(W*0.8+Math.cos(t*0.0004)*70, H*0.7+Math.sin(t*0.0006)*50, 20, W*0.8+Math.cos(t*0.0004)*70, H*0.7+Math.sin(t*0.0006)*50, 400);
-            g2.addColorStop(0,'rgba(180,70,255,0.06)'); g2.addColorStop(0.6,'rgba(0,150,255,0.03)'); g2.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+
             for (let p of pts) { p.update(); p.draw(); }
-            for (let i=0; i<pts.length; i++) for (let j=i+1; j<pts.length; j++) {
-                const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 140) {
-                    ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
-                    ctx.strokeStyle = `rgba(120,160,255,${(1 - dist/140)*0.25})`;
-                    ctx.lineWidth = 0.6; ctx.shadowBlur = 8; ctx.shadowColor = '#6b5cff'; ctx.stroke(); ctx.shadowBlur = 0;
+
+            // 仅在非移动端才渲染复杂的粒子间连线（原代码 O(N^2) 计算是手机卡顿的主要元凶）
+            if (!isMobile) {
+                for (let i=0; i<pts.length; i++) for (let j=i+1; j<pts.length; j++) {
+                    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 140) {
+                        ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+                        ctx.strokeStyle = `rgba(120,160,255,${(1 - dist/140)*0.25})`;
+                        ctx.lineWidth = 0.6; ctx.shadowBlur = 8; ctx.shadowColor = '#6b5cff'; ctx.stroke(); ctx.shadowBlur = 0;
+                    }
                 }
             }
             requestAnimationFrame(anim);
@@ -590,10 +571,12 @@
 
     function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-    document.addEventListener('DOMContentLoaded', () => document.getElementById('user-input').focus());
-
-    // ========== 仓库列表自适应：无需额外逻辑，直接使用HTML中已有的元素 ==========
-    // 所有在 #repoList 下的 .repo-item 都会自动显示，数量完全由HTML决定
+    document.addEventListener('DOMContentLoaded', () => {
+        // 手机端避免自动聚焦弹起键盘导致页面变形
+        if (window.innerWidth > 860) {
+            document.getElementById('user-input').focus();
+        }
+    });
 </script>
 </body>
 </html>

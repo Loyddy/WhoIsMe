@@ -1,5 +1,3 @@
---- START OF FILE text/html ---
-
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -313,25 +311,11 @@
             border-right: 2px solid var(--accent-purple);
         }
 
-        /* ===== 新增：消息内部 Markdown 排版适配 ===== */
-        .message p {
-            margin-bottom: 8px;
-        }
-        .message p:last-child {
-            margin-bottom: 0;
-        }
-        .message ul, .message ol {
-            margin: 6px 0 10px 18px;
-            padding-left: 4px;
-        }
-        .message li {
-            margin-bottom: 4px;
-            list-style-type: disc;
-        }
-        .message strong {
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
+        .message p { margin-bottom: 8px; }
+        .message p:last-child { margin-bottom: 0; }
+        .message ul, .message ol { margin: 6px 0 10px 18px; padding-left: 4px; }
+        .message li { margin-bottom: 4px; list-style-type: disc; }
+        .message strong { color: var(--accent-cyan); font-weight: 600; }
         .message code {
             background: rgba(0, 0, 0, 0.3);
             padding: 2px 6px;
@@ -456,7 +440,7 @@
 <canvas id="bg-canvas"></canvas>
 
 <div class="container">
-    <!-- 左侧：个人信息 + 树状技能矩阵 + 精选项目 -->
+    <!-- 左侧：个人信息 + 动态树状技能矩阵 + 动态精选项目 -->
     <div class="card left-card">
         <div class="profile-header">
             <div class="avatar">✦</div>
@@ -468,106 +452,19 @@
             <p>Welcome! On the right is my <strong>AI avatar</strong>. Feel free to decrypt my profile by chatting with it.</p>
         </div>
 
-        <!-- 可交互树状技术栈模块（已设为默认全关闭） -->
+        <!-- 动态加载树状技术栈模块 -->
         <div class="section-block">
             <div class="section-title">Tech Stack Tree</div>
-            <div class="tree-container">
-                <details>
-                    <summary>📂 My skills:</summary>
-                    <ul>
-                        <li>
-                            <details>
-                                <summary>📁 Python</summary>
-                                <ul>
-                                    <li>
-                                        <details>
-                                            <summary>📁 GUI & Desktop Apps</summary>
-                                            <ul>
-                                                <li>📄 PyQt6 / PySide Frameworks</li>
-                                                <li>📄 QSS Custom Dark Styling</li>
-                                                <li>📄 QPropertyAnimation & Easing Effects</li>
-                                                <li>📄 Custom Qt Widgets & Signal/Slot</li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                    <li>
-                                        <details>
-                                            <summary>📁 Concurrency & Process</summary>
-                                            <ul>
-                                                <li>📄 QThread & Asynchronous Workers</li>
-                                                <li>📄 Subprocess Management & Pipe I/O</li>
-                                                <li>📄 Thread-safe Logging & Event Dispatch</li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                    <li>
-                                        <details>
-                                            <summary>📁 Networking & Automation</summary>
-                                            <ul>
-                                                <li>📄 REST APIs & HTTP Streaming (Requests)</li>
-                                                <li>📄 Automated Zip Backup & File Operations</li>
-                                                <li>📄 RegEx & Config File Parsing</li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                </ul>
-                            </details>
-                        </li>
-                        <li>
-                            <details>
-                                <summary>📁 Java</summary>
-                                <ul>
-                                    <li>📄 Environment Variable Configuration</li>
-                                </ul>
-                            </details>
-                        </li>
-                        <li>
-                            <details>
-                                <summary>📁 HTML/JS/CSS</summary>
-                                <ul>
-                                    <li>📄 Modern Glassmorphism Web UI</li>
-                                    <li>📄 HTML5 Canvas Animation & Particle Systems</li>
-                                    <li>📄 Async Fetch API & Markdown Integration</li>
-                                </ul>
-                            </details>
-                        </li>
-                    </ul>
-                </details>
+            <div class="tree-container" id="tree-container">
+                <span style="opacity:0.6; font-size:12px;">Loading skills...</span>
             </div>
         </div>
 
-        <!-- 精选项目卡片列表 -->
+        <!-- 动态加载精选项目列表 -->
         <div class="section-block">
             <div class="section-title">Featured Projects</div>
             <div class="repo-list" id="repoList">
-                <a href="https://github.com/Loyddy/MSM" target="_blank" class="repo-card-item">
-                    <div class="repo-card-title">
-                        <span>MinecraftServerManager</span>
-                        <span>→</span>
-                    </div>
-                    <div class="repo-card-desc">A lightweight MC server administration tool</div>
-                </a>
-                <a href="https://github.com/Loyddy/MSM" target="_blank" class="repo-card-item">
-                    <div class="repo-card-title">
-                        <span>MinecraftServerManager</span>
-                        <span>→</span>
-                    </div>
-                    <div class="repo-card-desc">A lightweight MC server administration tool</div>
-                </a>
-                <a href="https://github.com/Loyddy/MSM" target="_blank" class="repo-card-item">
-                    <div class="repo-card-title">
-                        <span>MinecraftServerManager</span>
-                        <span>→</span>
-                    </div>
-                    <div class="repo-card-desc">A lightweight MC server administration tool</div>
-                </a>
-                <a href="https://github.com/Loyddy/MSM" target="_blank" class="repo-card-item">
-                    <div class="repo-card-title">
-                        <span>MinecraftServerManager</span>
-                        <span>→</span>
-                    </div>
-                    <div class="repo-card-desc">A lightweight MC server administration tool</div>
-                </a>
+                <span style="opacity:0.6; font-size:12px;">Loading projects...</span>
             </div>
         </div>
     </div>
@@ -586,7 +483,7 @@
     </div>
 </div>
 
-<!-- 底部固定的社交链接长方形模块 -->
+<!-- 底部固定的社交链接 -->
 <div class="social-footer-container">
     <div class="social-footer-card">
         <a href="https://github.com/Loyddy" target="_blank" class="social-btn">
@@ -609,6 +506,11 @@
 </div>
 
 <script>
+    const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
+    const CHAT_URL = `${BACKEND_BASE}/api/chat`;
+    const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
+
+    // 背景粒子效果
     (function bg() {
         const isMobile = window.innerWidth <= 860;
         if (isMobile) return;
@@ -656,7 +558,69 @@
         anim();
     })();
 
-    const BACKEND_URL = "https://backend-render-qs89.onrender.com/api/chat";
+    // 从后端动态拉取技能和项目数据
+    async function loadPortfolioData() {
+        try {
+            const res = await fetch(PORTFOLIO_URL);
+            const data = await res.json();
+            if (data.skills) renderSkills(data.skills);
+            if (data.projects) renderProjects(data.projects);
+        } catch (e) {
+            console.error("加载 Portfolio 数据失败:", e);
+            document.getElementById('tree-container').innerText = "⚠️ Failed to load skills.";
+            document.getElementById('repoList').innerText = "⚠️ Failed to load projects.";
+        }
+    }
+
+    function renderSkills(skills) {
+        const container = document.getElementById('tree-container');
+        let html = '<details><summary>📂 My skills:</summary><ul>';
+
+        skills.forEach(skill => {
+            html += `<li><details><summary>📁 ${escapeHtml(skill.category)}</summary><ul>`;
+            if (skill.subcategories) {
+                skill.subcategories.forEach(sub => {
+                    html += `<li><details><summary>📁 ${escapeHtml(sub.title)}</summary><ul>`;
+                    sub.items.forEach(item => {
+                        html += `<li>📄 ${escapeHtml(item)}</li>`;
+                    });
+                    html += '</ul></details></li>';
+                });
+            } else if (skill.items) {
+                skill.items.forEach(item => {
+                    html += `<li>📄 ${escapeHtml(item)}</li>`;
+                });
+            }
+            html += '</ul></details></li>';
+        });
+
+        html += '</ul></details>';
+        container.innerHTML = html;
+    }
+
+    function renderProjects(projects) {
+        const container = document.getElementById('repoList');
+        container.innerHTML = projects.map(p => `
+            <a href="${escapeHtml(p.url)}" target="_blank" class="repo-card-item">
+                <div class="repo-card-title">
+                    <span>${escapeHtml(p.title)}</span>
+                    <span>→</span>
+                </div>
+                <div class="repo-card-desc">${escapeHtml(p.description)}</div>
+            </a>
+        `).join('');
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // AI 对话控制 logic
     let chatHistory = [];
     const MAX_HISTORY = 20;
 
@@ -669,7 +633,7 @@
         input.value = '';
         const loadingId = appendMessage('⟡ Processing neural signal ...', 'ai');
         try {
-            const res = await fetch(BACKEND_URL, {
+            const res = await fetch(CHAT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, history: chatHistory })
@@ -689,7 +653,6 @@
         }
     }
 
-    /* ===== 已修改：支持解析 Markdown 的消息追加函数 ===== */
     function appendMessage(text, sender) {
         const box = document.getElementById('chat-box');
         const id = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
@@ -698,10 +661,8 @@
         div.className = `message msg-${sender}`;
 
         if (sender === 'ai' && typeof marked !== 'undefined') {
-            // AI 消息使用 marked 格式化 Markdown
             div.innerHTML = marked.parse(text);
         } else {
-            // 用户消息保持纯文本，防止 HTML 脚本注入
             div.textContent = text;
         }
 
@@ -718,6 +679,9 @@
     }
 
     function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+    // 初始化加载
+    window.addEventListener('DOMContentLoaded', loadPortfolioData);
 </script>
 </body>
 </html>

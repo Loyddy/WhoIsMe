@@ -82,29 +82,29 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 3. AI 对话逻辑 (已彻底修复并优化)
+// 3. AI 对话逻辑 (使用 DOM 节点直接引用更新，彻底解决误删 Bug)
 let chatHistory = [];
-let isSending = false; // 发送状态锁，防止并发发送
+let isSending = false;
 
 async function sendMessage() {
-    if (isSending) return; // 请求处理中则禁止再次触发
+    if (isSending) return;
 
     const input = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const text = input.value.trim();
     if (!text) return;
 
-    // 进入发送状态：加锁 & 禁用输入与按钮
+    // 进入发送状态：加锁 & 禁用输入框
     isSending = true;
     input.value = '';
     input.disabled = true;
     if (sendBtn) sendBtn.disabled = true;
 
-    // 1. 显示用户发送的消息
+    // 1. 追加用户发送的消息
     appendMessage(text, 'user');
 
-    // 2. 显示 Loading 状态占位卡片
-    const loadingId = appendMessage('⟡ Processing...', 'ai');
+    // 2. 追加 AI 占位消息，并直接拿到该 DOM 节点的引用
+    const aiMsgEl = appendMessage('⟡ Processing...', 'ai');
 
     try {
         const res = await fetch(CHAT_URL, {
@@ -113,27 +113,23 @@ async function sendMessage() {
             body: JSON.stringify({ message: text, history: chatHistory })
         });
 
-        // 收到回复后，安全删除 Loading 占位节点
-        removeMessage(loadingId);
-
         if (!res.ok) throw new Error(`HTTP Error status: ${res.status}`);
 
         const data = await res.json();
 
         if (data.reply) {
-            appendMessage(data.reply, 'ai');
-            // 响应成功后再同步推入对话历史，保证上下文完整
+            // 直接在原地将 Processing... 更新为真正的回复
+            updateMessageElement(aiMsgEl, data.reply, true);
             chatHistory.push({ role: "user", content: text });
             chatHistory.push({ role: "assistant", content: data.reply });
         } else {
-            appendMessage("⚠️ Error fetching reply.", 'ai');
+            updateMessageElement(aiMsgEl, "⚠️ Error fetching reply.", false);
         }
     } catch (err) {
         console.error("Chat request failed:", err);
-        removeMessage(loadingId);
-        appendMessage("❌ Connection lost.", 'ai');
+        updateMessageElement(aiMsgEl, "❌ Connection lost.", false);
     } finally {
-        // 恢复可用状态
+        // 解锁恢复状态
         isSending = false;
         input.disabled = false;
         if (sendBtn) sendBtn.disabled = false;
@@ -141,33 +137,35 @@ async function sendMessage() {
     }
 }
 
+// 创建并追加消息元素，返回 DOM 节点引用
 function appendMessage(text, sender) {
     const box = document.getElementById('chat-box');
-    const id = 'msg-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     const div = document.createElement('div');
-    div.id = id;
     div.className = `message msg-${sender}`;
 
-    if (sender === 'ai' && typeof marked !== 'undefined') {
-        div.innerHTML = marked.parse(text);
-    } else {
-        div.textContent = text;
-    }
+    updateMessageElement(div, text, sender === 'ai');
 
     box.appendChild(div);
+    scrollToBottom();
 
-    // 确保 Markdown / 节点完成构建后再平滑滚动到底部
+    return div; // 返回 DOM 节点
+}
+
+// 原地更新 DOM 节点的内容
+function updateMessageElement(el, text, isAi) {
+    if (isAi && typeof marked !== 'undefined') {
+        el.innerHTML = marked.parse(text);
+    } else {
+        el.textContent = text;
+    }
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const box = document.getElementById('chat-box');
     setTimeout(() => {
         box.scrollTop = box.scrollHeight;
     }, 20);
-
-    return id;
-}
-
-// 安全移除 DOM 节点 (防 null 报错)
-function removeMessage(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
 }
 
 function resetChat() {
@@ -187,7 +185,6 @@ function resetChat() {
     `;
 }
 
-// 监听键盘按键：修复中文输入法回车选词误发的 Bug
 function handleEnter(e) {
     if (e.key === 'Enter' && !e.isComposing) {
         e.preventDefault();

@@ -2,36 +2,134 @@ const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
 const CHAT_URL = `${BACKEND_BASE}/api/chat`;
 const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
 
-// 1. 粒子背景特效 (包含鼠标物理联动与 HUD 显示)
-let currentMouseMode = 'repel'; // 当前鼠标联动模式: 'repel' | 'attract' | 'connect' | 'off'
+let currentLang = 'zh';
+let cachedSkillsData = null;
 
-(function bg() {
+const i18n = {
+    zh: {
+        tagline: "越努力，越幸运",
+        profileDesc: "<p>欢迎！右侧是我的 <strong>AI 分身</strong>。欢迎与它对话，探索解锁我的个人档案。</p>",
+        techStackTitle: "核心技术栈",
+        featuredProjectsTitle: "精选项目",
+        failedSkills: "加载技能失败",
+        failedProjects: "加载项目失败",
+        skillsSummary: "📂 我的技能栈:",
+        chatTitle: "AI 分身",
+        initialMsg: "我是他的AI分身。你想了解关于他的什么信息？",
+        prompt1Btn: "⚡ 核心技术栈",
+        prompt1Query: "介绍一下他的核心技术栈？",
+        prompt2Btn: "💼 我的项目",
+        prompt2Query: "他做了哪些项目？",
+        prompt3Btn: "📫 联系方式",
+        prompt3Query: "如何直接联系到他？",
+        prompt4Btn: "🎲 个人趣事",
+        prompt4Query: "讲一个关于他的趣事或特长？",
+        inputPlaceholder: "关于他，随便问点什么...",
+        sendBtn: "发送",
+        resetTitle: "重置对话",
+        hudTitle: "⚡ 鼠标联动 // HUD",
+        hudRepel: "排斥",
+        hudAttract: "吸引",
+        hudConnect: "连线",
+        hudOff: "关闭",
+        hudRepelTitle: "粒子避开鼠标",
+        hudAttractTitle: "粒子向鼠标聚集",
+        hudConnectTitle: "鼠标与粒子连线",
+        hudOffTitle: "关闭交互",
+        thinkingText: "⟡ 量子回响计算中...",
+        errReply: "⚠️ 获取回复失败。",
+        connLost: "❌ 网络连接中断。"
+    },
+    en: {
+        tagline: "Fortune Favors the Sweat",
+        profileDesc: "<p>Welcome! On the right is my <strong>AI avatar</strong>. Feel free to decrypt my profile by chatting with it.</p>",
+        techStackTitle: "Tech Stack Tree",
+        featuredProjectsTitle: "Featured Projects",
+        failedSkills: "Failed to load skills.",
+        failedProjects: "Failed to load projects.",
+        skillsSummary: "📂 My skills:",
+        chatTitle: "AI Avatar",
+        initialMsg: "I am his AI avatar. What would you like to decrypt about him?",
+        prompt1Btn: "⚡ Core Tech Stack",
+        prompt1Query: "Can you introduce his core tech stack?",
+        prompt2Btn: "💼 Featured Projects",
+        prompt2Query: "What featured projects has he built?",
+        prompt3Btn: "📫 Contact Info",
+        prompt3Query: "How can I contact him directly?",
+        prompt4Btn: "🎲 Fun Facts",
+        prompt4Query: "Tell me a fun fact or unique skill about him.",
+        inputPlaceholder: "ask anything about me...",
+        sendBtn: "send",
+        resetTitle: "Reset Chat",
+        hudTitle: "⚡ MOUSE_LINK // HUD",
+        hudRepel: "Repel",
+        hudAttract: "Attract",
+        hudConnect: "Connect",
+        hudOff: "Off",
+        hudRepelTitle: "Particles repel from cursor",
+        hudAttractTitle: "Particles attract towards cursor",
+        hudConnectTitle: "Draw lines to cursor",
+        hudOffTitle: "Disable interaction",
+        thinkingText: "⟡ Quantum Echo Processing",
+        errReply: "⚠️ Error fetching reply.",
+        connLost: "❌ Connection lost."
+    }
+};
+
+// 1. 语言切换机制 (声明式属性驱动)
+function switchLanguage(lang) {
+    if (!i18n[lang]) return;
+    currentLang = lang;
+
+    document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+    const dict = i18n[lang];
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.placeholder = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key]) el.title = dict[key];
+    });
+
+    if (cachedSkillsData) renderSkills(cachedSkillsData);
+}
+
+// 2. Canvas 粒子背景特效
+let currentMouseMode = 'connect';
+
+(function initCanvas() {
     if (window.innerWidth <= 860) return;
     const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
     let W, H, pts = [];
     const mouse = { x: -1000, y: -1000, radius: 140 };
 
-    function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
+    const resize = () => { W = c.width = window.innerWidth; H = c.height = window.innerHeight; };
+    window.addEventListener('resize', resize);
+    resize();
 
-    // 监听鼠标移动，实时更新坐标及 HUD 面板数字
+    const xEl = document.getElementById('hud-x');
+    const yEl = document.getElementById('hud-y');
+
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
-        const xEl = document.getElementById('hud-x');
-        const yEl = document.getElementById('hud-y');
         if (xEl && yEl) {
             xEl.textContent = String(Math.round(mouse.x)).padStart(4, '0');
             yEl.textContent = String(Math.round(mouse.y)).padStart(4, '0');
         }
     });
 
-    window.addEventListener('mouseleave', () => {
-        mouse.x = -1000;
-        mouse.y = -1000;
-    });
+    window.addEventListener('mouseleave', () => { mouse.x = mouse.y = -1000; });
 
-    class P {
+    class Particle {
         constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * W;
@@ -41,59 +139,32 @@ let currentMouseMode = 'repel'; // 当前鼠标联动模式: 'repel' | 'attract'
             this.vx = this.baseVx;
             this.vy = this.baseVy;
             this.s = Math.random() * 2.2 + 0.6;
-            this.c = `hsla(${220 + Math.random() * 60}, 80%, 70%, 0.6)`;
+            this.c = `hsla(${255 + Math.random() * 25}, 65%, 72%, 0.55)`;
         }
         update() {
-            // 物理交互计算
-            if (currentMouseMode !== 'off' && mouse.x > 0 && mouse.y > 0) {
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+            if (currentMouseMode !== 'off' && mouse.x > 0) {
+                const dx = mouse.x - this.x, dy = mouse.y - this.y;
+                const dist = Math.hypot(dx, dy);
 
                 if (dist < mouse.radius) {
                     const force = (mouse.radius - dist) / mouse.radius;
                     const angle = Math.atan2(dy, dx);
-
-                    if (currentMouseMode === 'repel') {
-                        // 磁极排斥
-                        this.x -= Math.cos(angle) * force * 5;
-                        this.y -= Math.sin(angle) * force * 5;
-                    } else if (currentMouseMode === 'attract') {
-                        // 万有引力
-                        this.x += Math.cos(angle) * force * 3;
-                        this.y += Math.sin(angle) * force * 3;
+                    const speed = currentMouseMode === 'repel' ? -5 : (currentMouseMode === 'attract' ? 3 : 0);
+                    if (speed) {
+                        this.x += Math.cos(angle) * force * speed;
+                        this.y += Math.sin(angle) * force * speed;
                     }
                 }
             }
 
-            // 基础惯性移动
             this.x += this.vx;
             this.y += this.vy;
-
-            // 阻尼恢复原速
             this.vx += (this.baseVx - this.vx) * 0.05;
             this.vy += (this.baseVy - this.vy) * 0.05;
 
-            // ===== 修复核心 Bug：严格边界处理与位置归位 =====
-            if (this.x <= 0) {
-                this.x = 0;
-                this.vx = Math.abs(this.vx);
-                this.baseVx = Math.abs(this.baseVx);
-            } else if (this.x >= W) {
-                this.x = W;
-                this.vx = -Math.abs(this.vx);
-                this.baseVx = -Math.abs(this.baseVx);
-            }
-
-            if (this.y <= 0) {
-                this.y = 0;
-                this.vy = Math.abs(this.vy);
-                this.baseVy = Math.abs(this.baseVy);
-            } else if (this.y >= H) {
-                this.y = H;
-                this.vy = -Math.abs(this.vy);
-                this.baseVy = -Math.abs(this.baseVy);
-            }
+            // 边缘反弹简化
+            if (this.x <= 0 || this.x >= W) { this.x = Math.max(0, Math.min(W, this.x)); this.vx *= -1; this.baseVx *= -1; }
+            if (this.y <= 0 || this.y >= H) { this.y = Math.max(0, Math.min(H, this.y)); this.vy *= -1; this.baseVy *= -1; }
         }
         draw() {
             ctx.beginPath();
@@ -101,16 +172,13 @@ let currentMouseMode = 'repel'; // 当前鼠标联动模式: 'repel' | 'attract'
             ctx.fillStyle = this.c;
             ctx.fill();
 
-            // 量子连线模式算法
-            if (currentMouseMode === 'connect' && mouse.x > 0 && mouse.y > 0) {
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+            if (currentMouseMode === 'connect' && mouse.x > 0) {
+                const dist = Math.hypot(mouse.x - this.x, mouse.y - this.y);
                 if (dist < mouse.radius + 30) {
                     ctx.beginPath();
                     ctx.moveTo(this.x, this.y);
                     ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = `rgba(0, 229, 255, ${1 - dist / (mouse.radius + 30)})`;
+                    ctx.strokeStyle = `rgba(155, 135, 202, ${1 - dist / (mouse.radius + 30)})`;
                     ctx.lineWidth = 0.8;
                     ctx.stroke();
                 }
@@ -118,46 +186,46 @@ let currentMouseMode = 'repel'; // 当前鼠标联动模式: 'repel' | 'attract'
         }
     }
 
-    for (let i = 0; i < 110; i++) pts.push(new P());
+    for (let i = 0; i < 110; i++) pts.push(new Particle());
 
-    function anim() {
+    (function anim() {
         ctx.clearRect(0, 0, W, H);
-        for (let p of pts) { p.update(); p.draw(); }
+        pts.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(anim);
-    }
-    anim();
+    })();
 })();
 
-// HUD 模式切换函数
+// HUD 切换与折叠
 function setMouseMode(mode, btn) {
     currentMouseMode = mode;
     document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
 }
 
-// HUD 折叠/展开切换
 function toggleHud() {
     const hud = document.getElementById('mouse-hud');
-    const icon = document.getElementById('hud-toggle-icon');
     hud.classList.toggle('collapsed');
-    icon.textContent = hud.classList.contains('collapsed') ? '+' : '−';
+    document.getElementById('hud-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
 }
 
-// 2. 动态获取后端 Portfolio 数据
+// 3. 后端 API 交互
 async function loadPortfolioData() {
     try {
         const res = await fetch(PORTFOLIO_URL);
         const data = await res.json();
-        if (data.skills) renderSkills(data.skills);
+        if (data.skills) {
+            cachedSkillsData = data.skills;
+            renderSkills(data.skills);
+        }
         if (data.projects) renderProjects(data.projects);
-    } catch (e) {
-        document.getElementById('tree-container').innerText = "Failed to load skills.";
-        document.getElementById('repoList').innerText = "Failed to load projects.";
+    } catch {
+        document.getElementById('tree-container').innerText = i18n[currentLang].failedSkills;
+        document.getElementById('repoList').innerText = i18n[currentLang].failedProjects;
     }
 }
 
 function renderSkills(skills) {
-    let html = '<details><summary>📂 My skills:</summary><ul>';
+    let html = `<details><summary>${i18n[currentLang].skillsSummary}</summary><ul>`;
     skills.forEach(s => {
         html += `<li><details><summary>📁 ${escapeHtml(s.category)}</summary><ul>`;
         if (s.subcategories) {
@@ -188,42 +256,49 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 3. AI 对话逻辑
+// 4. AI 聊天功能
 let chatHistory = [];
 let isSending = false;
 
-// 快捷提问气泡触发函数
-function sendQuickPrompt(promptText) {
+function sendQuickPrompt(queryKey) {
     if (isSending) return;
-    const input = document.getElementById('user-input');
-    input.value = promptText;
-    sendMessage();
+    const text = i18n[currentLang][queryKey];
+    if (text) {
+        document.getElementById('user-input').value = text;
+        sendMessage();
+    }
 }
 
-function setQuickPromptsDisabled(disabled) {
+function setFormDisabled(disabled) {
+    document.getElementById('user-input').disabled = disabled;
+    const sendBtn = document.getElementById('send-btn');
+    if (sendBtn) sendBtn.disabled = disabled;
     document.querySelectorAll('.prompt-btn').forEach(btn => btn.disabled = disabled);
 }
 
 async function sendMessage() {
     if (isSending) return;
-
     const input = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
     const text = input.value.trim();
     if (!text) return;
 
-    // 进入发送状态：加锁 & 禁用输入框与快捷气泡
     isSending = true;
     input.value = '';
-    input.disabled = true;
-    if (sendBtn) sendBtn.disabled = true;
-    setQuickPromptsDisabled(true);
+    setFormDisabled(true);
 
-    // 1. 追加用户发送的消息
     appendMessage(text, 'user');
 
-    // 2. 追加 AI 占位消息，并直接拿到该 DOM 节点的引用
-    const aiMsgEl = appendMessage('⟡ Processing...', 'ai');
+    const thinkingHtml = `
+        <div class="quantum-thinking">
+            <span>${i18n[currentLang].thinkingText}</span>
+            <div class="wave-bars">
+                <div class="wave-bar"></div><div class="wave-bar"></div>
+                <div class="wave-bar"></div><div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+        </div>
+    `;
+    const aiMsgEl = appendMessage(thinkingHtml, 'ai', true);
 
     try {
         const res = await fetch(CHAT_URL, {
@@ -232,74 +307,60 @@ async function sendMessage() {
             body: JSON.stringify({ message: text, history: chatHistory })
         });
 
-        if (!res.ok) throw new Error(`HTTP Error status: ${res.status}`);
-
+        if (!res.ok) throw new Error(`Status: ${res.status}`);
         const data = await res.json();
 
         if (data.reply) {
             updateMessageElement(aiMsgEl, data.reply, true);
-            chatHistory.push({ role: "user", content: text });
-            chatHistory.push({ role: "assistant", content: data.reply });
+            chatHistory.push({ role: "user", content: text }, { role: "assistant", content: data.reply });
         } else {
-            updateMessageElement(aiMsgEl, "⚠️ Error fetching reply.", false);
+            updateMessageElement(aiMsgEl, i18n[currentLang].errReply, false);
         }
     } catch (err) {
         console.error("Chat request failed:", err);
-        updateMessageElement(aiMsgEl, "❌ Connection lost.", false);
+        updateMessageElement(aiMsgEl, i18n[currentLang].connLost, false);
     } finally {
-        // 解锁恢复状态
         isSending = false;
-        input.disabled = false;
-        if (sendBtn) sendBtn.disabled = false;
-        setQuickPromptsDisabled(false);
+        setFormDisabled(false);
         input.focus();
     }
 }
 
-function appendMessage(text, sender) {
+function appendMessage(text, sender, isHtml = false) {
     const box = document.getElementById('chat-box');
     const div = document.createElement('div');
     div.className = `message msg-${sender}`;
-
-    updateMessageElement(div, text, sender === 'ai');
-
     box.appendChild(div);
-    scrollToBottom();
 
+    if (isHtml) {
+        div.innerHTML = text;
+    } else {
+        updateMessageElement(div, text, sender === 'ai');
+    }
+
+    scrollToBottom();
     return div;
 }
 
 function updateMessageElement(el, text, isAi) {
-    if (isAi && typeof marked !== 'undefined') {
-        el.innerHTML = marked.parse(text);
-    } else {
-        el.textContent = text;
-    }
+    el.innerHTML = (isAi && typeof marked !== 'undefined') ? marked.parse(text) : escapeHtml(text);
     scrollToBottom();
 }
 
 function scrollToBottom() {
     const box = document.getElementById('chat-box');
-    setTimeout(() => {
-        box.scrollTop = box.scrollHeight;
-    }, 20);
+    setTimeout(() => { box.scrollTop = box.scrollHeight; }, 20);
 }
 
 function resetChat() {
     chatHistory = [];
     isSending = false;
     const input = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-
-    if (input) {
-        input.disabled = false;
-        input.value = '';
-    }
-    if (sendBtn) sendBtn.disabled = false;
-    setQuickPromptsDisabled(false);
+    if (input) { input.value = ''; }
+    setFormDisabled(false);
 
     document.getElementById('chat-box').innerHTML = `
-        <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
+        <div class="message msg-ai" data-i18n="initialMsg">${i18n[currentLang].initialMsg}</div>
     `;
 }
 
@@ -310,4 +371,7 @@ function handleEnter(e) {
     }
 }
 
-window.addEventListener('DOMContentLoaded', loadPortfolioData);
+window.addEventListener('DOMContentLoaded', () => {
+    switchLanguage('zh');
+    loadPortfolioData();
+});

@@ -64,10 +64,38 @@
         <div class="chat-box" id="chat-box">
             <div class="message msg-ai">Signal acquired. I am Master's quantum echo. Tell me your identity. What would you like to decrypt about him? (you can use any language you want)</div>
         </div>
+
+        <!-- 快捷提问气泡组件 -->
+        <div class="quick-prompts">
+            <button class="prompt-btn" onclick="sendQuickPrompt('介绍一下 Master 的核心技术栈？')">⚡ 核心技术栈</button>
+            <button class="prompt-btn" onclick="sendQuickPrompt('Master 做了哪些精选项目？')">💼 精选项目</button>
+            <button class="prompt-btn" onclick="sendQuickPrompt('如何直接联系到 Master？')">📫 联系方式</button>
+            <button class="prompt-btn" onclick="sendQuickPrompt('讲一个关于 Master 的趣事或特长？')">🎲 个人趣事</button>
+        </div>
+
         <div class="input-area">
             <input type="text" id="user-input" placeholder="ask anything about me..." onkeydown="handleEnter(event)">
             <button id="send-btn" onclick="sendMessage()">send</button>
             <button class="btn-reset" onclick="resetChat()" title="重置对话">⟳</button>
+        </div>
+    </div>
+</div>
+
+<!-- 右下角鼠标联动 HUD 控制面板 -->
+<div class="mouse-hud" id="mouse-hud">
+    <div class="hud-header" onclick="toggleHud()">
+        <span class="hud-title">⚡ MOUSE_LINK // HUD</span>
+        <span class="hud-toggle-icon" id="hud-toggle-icon">−</span>
+    </div>
+    <div class="hud-body" id="hud-body">
+        <div class="hud-coords">
+            X: <span id="hud-x">0000</span> | Y: <span id="hud-y">0000</span>
+        </div>
+        <div class="hud-modes">
+            <button class="hud-btn active" onclick="setMouseMode('repel', this)" title="粒子避开鼠标">排斥</button>
+            <button class="hud-btn" onclick="setMouseMode('attract', this)" title="粒子向鼠标聚集">吸引</button>
+            <button class="hud-btn" onclick="setMouseMode('connect', this)" title="鼠标与粒子连线">连线</button>
+            <button class="hud-btn" onclick="setMouseMode('off', this)" title="关闭交互">关闭</button>
         </div>
     </div>
 </div>

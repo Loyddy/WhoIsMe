@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -7,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body>
+<body data-theme="default">
 
 <canvas id="bg-canvas"></canvas>
 
@@ -83,21 +84,39 @@
     </div>
 </div>
 
-<!-- 右下角鼠标联动 HUD 控制面板 -->
-<div class="mouse-hud" id="mouse-hud">
-    <div class="hud-header" onclick="toggleHud()">
-        <span class="hud-title" data-i18n="hudTitle">⚡ 鼠标联动 // HUD</span>
-        <span class="hud-toggle-icon" id="hud-toggle-icon">−</span>
-    </div>
-    <div class="hud-body" id="hud-body">
-        <div class="hud-coords">
-            X: <span id="hud-x">0000</span> | Y: <span id="hud-y">0000</span>
+<!-- 右下角 Stack HUDs 面板组 -->
+<div class="hud-stack">
+    <!-- 主题切换 HUD 控制面板 -->
+    <div class="mouse-hud theme-hud" id="theme-hud">
+        <div class="hud-header" onclick="toggleThemeHud()">
+            <span class="hud-title" data-i18n="themeTitle">🎨 视觉主题 // STYLES</span>
+            <span class="hud-toggle-icon" id="theme-toggle-icon">−</span>
         </div>
-        <div class="hud-modes">
-            <button class="hud-btn" id="hud-btn-repel" onclick="setMouseMode('repel', this)" data-i18n="hudRepel" data-i18n-title="hudRepelTitle" title="粒子避开鼠标">排斥</button>
-            <button class="hud-btn" id="hud-btn-attract" onclick="setMouseMode('attract', this)" data-i18n="hudAttract" data-i18n-title="hudAttractTitle" title="粒子向鼠标聚集">吸引</button>
-            <button class="hud-btn active" id="hud-btn-connect" onclick="setMouseMode('connect', this)" data-i18n="hudConnect" data-i18n-title="hudConnectTitle" title="鼠标与粒子连线">连线</button>
-            <button class="hud-btn" id="hud-btn-off" onclick="setMouseMode('off', this)" data-i18n="hudOff" data-i18n-title="hudOffTitle" title="关闭交互">关闭</button>
+        <div class="hud-body" id="theme-hud-body">
+            <div class="hud-modes theme-modes">
+                <button class="hud-btn active" id="theme-btn-default" onclick="setThemeStyle('default', this)" data-i18n="themeDefault">薰衣草</button>
+                <button class="hud-btn" id="theme-btn-cyberpunk" onclick="setThemeStyle('cyberpunk', this)" data-i18n="themeCyberpunk">赛博朋克</button>
+                <button class="hud-btn" id="theme-btn-abstract" onclick="setThemeStyle('abstract', this)" data-i18n="themeAbstract">抽象几何</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 鼠标联动 HUD 控制面板 -->
+    <div class="mouse-hud" id="mouse-hud">
+        <div class="hud-header" onclick="toggleHud()">
+            <span class="hud-title" data-i18n="hudTitle">⚡ 鼠标联动 // HUD</span>
+            <span class="hud-toggle-icon" id="hud-toggle-icon">−</span>
+        </div>
+        <div class="hud-body" id="hud-body">
+            <div class="hud-coords">
+                X: <span id="hud-x">0000</span> | Y: <span id="hud-y">0000</span>
+            </div>
+            <div class="hud-modes">
+                <button class="hud-btn" id="hud-btn-repel" onclick="setMouseMode('repel', this)" data-i18n="hudRepel" data-i18n-title="hudRepelTitle" title="粒子避开鼠标">排斥</button>
+                <button class="hud-btn" id="hud-btn-attract" onclick="setMouseMode('attract', this)" data-i18n="hudAttract" data-i18n-title="hudAttractTitle" title="粒子向鼠标聚集">吸引</button>
+                <button class="hud-btn active" id="hud-btn-connect" onclick="setMouseMode('connect', this)" data-i18n="hudConnect" data-i18n-title="hudConnectTitle" title="鼠标与粒子连线">连线</button>
+                <button class="hud-btn" id="hud-btn-off" onclick="setMouseMode('off', this)" data-i18n="hudOff" data-i18n-title="hudOffTitle" title="关闭交互">关闭</button>
+            </div>
         </div>
     </div>
 </div>

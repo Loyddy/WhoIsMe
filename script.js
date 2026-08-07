@@ -1,8 +1,10 @@
+
 const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
 const CHAT_URL = `${BACKEND_BASE}/api/chat`;
 const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
 
 let currentLang = 'zh';
+let currentTheme = 'default';
 let cachedSkillsData = null;
 
 const i18n = {
@@ -18,7 +20,7 @@ const i18n = {
         initialMsg: "我是他的AI分身。你想了解关于他的什么信息？",
         prompt1Btn: "⚡ 核心技术栈",
         prompt1Query: "介绍一下他的核心技术栈？",
-        prompt2Btn: "💼 我的项目",
+        prompt2Btn: "💼 精选项目",
         prompt2Query: "他做了哪些项目？",
         prompt3Btn: "📫 联系方式",
         prompt3Query: "如何直接联系到他？",
@@ -27,6 +29,10 @@ const i18n = {
         inputPlaceholder: "关于他，随便问点什么...",
         sendBtn: "发送",
         resetTitle: "重置对话",
+        themeTitle: "🎨 视觉主题 // STYLES",
+        themeDefault: "薰衣草",
+        themeCyberpunk: "赛博朋克",
+        themeAbstract: "抽象几何",
         hudTitle: "⚡ 鼠标联动 // HUD",
         hudRepel: "排斥",
         hudAttract: "吸引",
@@ -61,6 +67,10 @@ const i18n = {
         inputPlaceholder: "ask anything about me...",
         sendBtn: "send",
         resetTitle: "Reset Chat",
+        themeTitle: "🎨 THEME // STYLES",
+        themeDefault: "Lavender",
+        themeCyberpunk: "Cyberpunk",
+        themeAbstract: "Abstract",
         hudTitle: "⚡ MOUSE_LINK // HUD",
         hudRepel: "Repel",
         hudAttract: "Attract",
@@ -76,7 +86,7 @@ const i18n = {
     }
 };
 
-// 1. 语言切换机制 (声明式属性驱动)
+// 1. 语言与主题切换机制
 function switchLanguage(lang) {
     if (!i18n[lang]) return;
     currentLang = lang;
@@ -102,7 +112,26 @@ function switchLanguage(lang) {
     if (cachedSkillsData) renderSkills(cachedSkillsData);
 }
 
-// 2. Canvas 粒子背景特效
+function setThemeStyle(theme, btn) {
+    currentTheme = theme;
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-modes .hud-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function toggleThemeHud() {
+    const hud = document.getElementById('theme-hud');
+    hud.classList.toggle('collapsed');
+    document.getElementById('theme-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
+}
+
+function toggleHud() {
+    const hud = document.getElementById('mouse-hud');
+    hud.classList.toggle('collapsed');
+    document.getElementById('hud-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
+}
+
+// 2. Multi-Theme Canvas 粒子/几何背景特效
 let currentMouseMode = 'connect';
 
 (function initCanvas() {
@@ -129,17 +158,22 @@ let currentMouseMode = 'connect';
 
     window.addEventListener('mouseleave', () => { mouse.x = mouse.y = -1000; });
 
+    const abstractColors = ['#ff3366', '#2244ff', '#ffee00', '#00e5ff', '#ff9900'];
+
     class Particle {
         constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * W;
             this.y = Math.random() * H;
-            this.baseVx = (Math.random() - 0.5) * 0.45;
-            this.baseVy = (Math.random() - 0.5) * 0.45;
+            this.baseVx = (Math.random() - 0.5) * 0.6;
+            this.baseVy = (Math.random() - 0.5) * 0.6;
             this.vx = this.baseVx;
             this.vy = this.baseVy;
-            this.s = Math.random() * 2.2 + 0.6;
-            this.c = `hsla(${255 + Math.random() * 25}, 65%, 72%, 0.55)`;
+            this.s = Math.random() * 8 + 3;
+            this.angle = Math.random() * Math.PI * 2;
+            this.rotSpeed = (Math.random() - 0.5) * 0.05;
+            this.shape = Math.floor(Math.random() * 4);
+            this.color = abstractColors[Math.floor(Math.random() * abstractColors.length)];
         }
         update() {
             if (currentMouseMode !== 'off' && mouse.x > 0) {
@@ -149,7 +183,7 @@ let currentMouseMode = 'connect';
                 if (dist < mouse.radius) {
                     const force = (mouse.radius - dist) / mouse.radius;
                     const angle = Math.atan2(dy, dx);
-                    const speed = currentMouseMode === 'repel' ? -5 : (currentMouseMode === 'attract' ? 3 : 0);
+                    const speed = currentMouseMode === 'repel' ? -6 : (currentMouseMode === 'attract' ? 4 : 0);
                     if (speed) {
                         this.x += Math.cos(angle) * force * speed;
                         this.y += Math.sin(angle) * force * speed;
@@ -159,34 +193,96 @@ let currentMouseMode = 'connect';
 
             this.x += this.vx;
             this.y += this.vy;
+            this.angle += this.rotSpeed;
             this.vx += (this.baseVx - this.vx) * 0.05;
             this.vy += (this.baseVy - this.vy) * 0.05;
 
-            // 边缘反弹简化
-            if (this.x <= 0 || this.x >= W) { this.x = Math.max(0, Math.min(W, this.x)); this.vx *= -1; this.baseVx *= -1; }
-            if (this.y <= 0 || this.y >= H) { this.y = Math.max(0, Math.min(H, this.y)); this.vy *= -1; this.baseVy *= -1; }
+            if (this.x <= 0 || this.x >= W) { this.vx *= -1; this.baseVx *= -1; }
+            if (this.y <= 0 || this.y >= H) { this.vy *= -1; this.baseVy *= -1; }
         }
         draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
-            ctx.fillStyle = this.c;
-            ctx.fill();
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
 
+            if (currentTheme === 'cyberpunk') {
+                // 极客霓虹发光节点
+                const color = (this.shape % 2 === 0) ? '#00f0ff' : '#b026ff';
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = color;
+
+                if (this.shape % 2 === 0) {
+                    ctx.strokeRect(-this.s/2, -this.s/2, this.s, this.s);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(-this.s, 0); ctx.lineTo(this.s, 0);
+                    ctx.moveTo(0, -this.s); ctx.lineTo(0, this.s);
+                    ctx.stroke();
+                }
+            } else if (currentTheme === 'abstract') {
+                // 五彩抽象几何风
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = '#111111';
+                ctx.lineWidth = 2;
+
+                if (this.shape === 0) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.s, 0, Math.PI * 2);
+                    ctx.fill(); ctx.stroke();
+                } else if (this.shape === 1) {
+                    ctx.fillRect(-this.s, -this.s, this.s * 2, this.s * 2);
+                    ctx.strokeRect(-this.s, -this.s, this.s * 2, this.s * 2);
+                } else if (this.shape === 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.s * 1.3);
+                    ctx.lineTo(this.s, this.s);
+                    ctx.lineTo(-this.s, this.s);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.s, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            } else {
+                // 默认：薰衣草微光
+                ctx.beginPath();
+                ctx.arc(0, 0, this.s * 0.35, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${255 + Math.random() * 25}, 65%, 72%, 0.55)`;
+                ctx.fill();
+            }
+            ctx.restore();
+
+            // 连线特效
             if (currentMouseMode === 'connect' && mouse.x > 0) {
                 const dist = Math.hypot(mouse.x - this.x, mouse.y - this.y);
                 if (dist < mouse.radius + 30) {
                     ctx.beginPath();
                     ctx.moveTo(this.x, this.y);
                     ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = `rgba(155, 135, 202, ${1 - dist / (mouse.radius + 30)})`;
-                    ctx.lineWidth = 0.8;
+                    const alpha = 1 - dist / (mouse.radius + 30);
+                    if (currentTheme === 'cyberpunk') {
+                        ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#00f0ff';
+                    } else if (currentTheme === 'abstract') {
+                        ctx.strokeStyle = `rgba(17, 17, 17, ${alpha})`;
+                        ctx.lineWidth = 1.5;
+                        ctx.shadowBlur = 0;
+                    } else {
+                        ctx.strokeStyle = `rgba(155, 135, 202, ${alpha})`;
+                        ctx.shadowBlur = 0;
+                    }
                     ctx.stroke();
                 }
             }
         }
     }
 
-    for (let i = 0; i < 110; i++) pts.push(new Particle());
+    for (let i = 0; i < 90; i++) pts.push(new Particle());
 
     (function anim() {
         ctx.clearRect(0, 0, W, H);
@@ -195,17 +291,10 @@ let currentMouseMode = 'connect';
     })();
 })();
 
-// HUD 切换与折叠
 function setMouseMode(mode, btn) {
     currentMouseMode = mode;
-    document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#mouse-hud .hud-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-}
-
-function toggleHud() {
-    const hud = document.getElementById('mouse-hud');
-    hud.classList.toggle('collapsed');
-    document.getElementById('hud-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
 }
 
 // 3. 后端 API 交互

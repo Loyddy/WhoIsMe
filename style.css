@@ -1,5 +1,3 @@
-
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
     --bg-primary: #f8f6fc;
@@ -13,6 +11,120 @@
     --shadow-glow: 0 10px 30px rgba(155, 135, 202, 0.12);
     --font-mono: 'Segoe UI', 'JetBrains Mono', monospace;
     --radius-lg: 24px;
+}
+
+/* ==================== 薰衣草风格开场入场遮罩组件 ==================== */
+.intro-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f3effa 60%, #e8e0f8 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-overlay.hidden {
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+}
+
+.intro-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    gap: 22px;
+}
+
+.intro-character-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid rgba(155, 135, 202, 0.8);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(155, 135, 202, 0.3);
+    z-index: 2;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    background: #f3ecfe;
+}
+
+.intro-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+.intro-content:hover .intro-avatar {
+    transform: scale(1.12);
+    box-shadow: 0 15px 40px rgba(155, 135, 202, 0.45);
+    border-color: #7962aa;
+}
+
+.intro-pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(155, 135, 202, 0.6);
+    opacity: 0.8;
+    animation: lavenderPulse 2.4s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.intro-pulse-ring.delay {
+    animation-delay: 1.2s;
+    border-color: rgba(121, 98, 170, 0.4);
+}
+
+@keyframes lavenderPulse {
+    0% { transform: scale(0.75); opacity: 0.9; }
+    100% { transform: scale(2.4); opacity: 0; }
+}
+
+.intro-prompt {
+    font-size: 14px;
+    color: #7962aa;
+    letter-spacing: 3px;
+    font-weight: 600;
+    text-shadow: 0 2px 10px rgba(155, 135, 202, 0.2);
+    animation: gentleGlow 2.5s infinite ease-in-out;
+}
+
+.intro-subtext {
+    font-size: 11px;
+    color: #a295c2;
+    letter-spacing: 4px;
+    font-weight: 500;
+}
+
+@keyframes gentleGlow {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.65; transform: translateY(-2px); }
+}
+
+/* 渐进式解锁主界面过渡 */
+.container, .hud-stack, .lang-switch-container {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+}
+
+body.unlocked .container,
+body.unlocked .hud-stack,
+body.unlocked .lang-switch-container {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ==================== 主题风格定义 ==================== */
@@ -35,7 +147,6 @@ body[data-theme="cyberpunk"] {
     --shadow-glow: 0 0 25px rgba(0, 240, 255, 0.35);
     --radius-lg: 6px;
 
-    /* 深暗底色 + 蓝紫双色绚丽光晕 + 极客网格 */
     background:
         radial-gradient(circle at 18% 20%, rgba(176, 38, 255, 0.32) 0%, transparent 40%),
         radial-gradient(circle at 82% 75%, rgba(0, 240, 255, 0.28) 0%, transparent 45%),

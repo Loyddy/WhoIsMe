@@ -1,4 +1,3 @@
-
 const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
 const CHAT_URL = `${BACKEND_BASE}/api/chat`;
 const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
@@ -9,6 +8,7 @@ let cachedSkillsData = null;
 
 const i18n = {
     zh: {
+        introPrompt: "点击解锁",
         tagline: "越努力，越幸运",
         profileDesc: "<p>欢迎！右侧是我的 <strong>AI 分身</strong>。欢迎与它对话，探索解锁我的个人档案。</p>",
         techStackTitle: "核心技术栈",
@@ -47,6 +47,7 @@ const i18n = {
         connLost: "❌ 网络连接中断。"
     },
     en: {
+        introPrompt: "✨ CLICK TO UNLOCK MASTER'S DIGITAL ECHO",
         tagline: "Fortune Favors the Sweat",
         profileDesc: "<p>Welcome! On the right is my <strong>AI avatar</strong>. Feel free to decrypt my profile by chatting with it.</p>",
         techStackTitle: "Tech Stack Tree",
@@ -85,6 +86,18 @@ const i18n = {
         connLost: "❌ Connection lost."
     }
 };
+
+// 开场动画解锁主界面
+function enterMainSite() {
+    const overlay = document.getElementById('intro-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        document.body.classList.add('unlocked');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 800);
+    }
+}
 
 // 1. 语言与主题切换机制
 function switchLanguage(lang) {
@@ -206,7 +219,6 @@ let currentMouseMode = 'connect';
             ctx.rotate(this.angle);
 
             if (currentTheme === 'cyberpunk') {
-                // 极客霓虹发光节点
                 const color = (this.shape % 2 === 0) ? '#00f0ff' : '#b026ff';
                 ctx.strokeStyle = color;
                 ctx.fillStyle = color;
@@ -223,10 +235,10 @@ let currentMouseMode = 'connect';
                     ctx.stroke();
                 }
             } else if (currentTheme === 'abstract') {
-                // 五彩抽象几何风
                 ctx.fillStyle = this.color;
                 ctx.strokeStyle = '#111111';
                 ctx.lineWidth = 2;
+                ctx.shadowBlur = 0;
 
                 if (this.shape === 0) {
                     ctx.beginPath();
@@ -248,7 +260,7 @@ let currentMouseMode = 'connect';
                     ctx.stroke();
                 }
             } else {
-                // 默认：薰衣草微光
+                ctx.shadowBlur = 0;
                 ctx.beginPath();
                 ctx.arc(0, 0, this.s * 0.35, 0, Math.PI * 2);
                 ctx.fillStyle = `hsla(${255 + Math.random() * 25}, 65%, 72%, 0.55)`;
@@ -256,7 +268,6 @@ let currentMouseMode = 'connect';
             }
             ctx.restore();
 
-            // 连线特效
             if (currentMouseMode === 'connect' && mouse.x > 0) {
                 const dist = Math.hypot(mouse.x - this.x, mouse.y - this.y);
                 if (dist < mouse.radius + 30) {

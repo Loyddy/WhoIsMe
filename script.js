@@ -1,6 +1,7 @@
 const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
 const CHAT_URL = `${BACKEND_BASE}/api/chat`;
 const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
+const VERIFY_URL = `${BACKEND_BASE}/api/verify`; // 新增
 
 let currentLang = 'zh';
 let currentTheme = 'default';
@@ -101,17 +102,40 @@ async function verifyAndUnlock() {
         return;
     }
 
-    // 将密码暂存到 sessionStorage
-    sessionStorage.setItem('site_password', pwd);
+    const unlockBtn = document.querySelector('.password-group button');
+    if (unlockBtn) unlockBtn.disabled = true;
 
-    // 尝试发送一条测试聊天或直接解锁，由后端在正式发消息时把关
-    const overlay = document.getElementById('intro-overlay');
-    if (overlay) {
-        overlay.classList.add('hidden');
-        document.body.classList.add('unlocked');
-        setTimeout(() => {
-            overlay.style.display = 'none';
-        }, 800);
+    try {
+        const res = await fetch(VERIFY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pwd })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            sessionStorage.setItem('site_password', pwd);
+            errorEl.style.display = 'none';
+
+            const overlay = document.getElementById('intro-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                document.body.classList.add('unlocked');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 800);
+            }
+        } else {
+            errorEl.style.display = 'block';
+            errorEl.textContent = currentLang === 'zh' ? '密码错误，请重试' : 'Incorrect password, please try again';
+        }
+    } catch (err) {
+        console.error("Verification failed:", err);
+        errorEl.style.display = 'block';
+        errorEl.textContent = currentLang === 'zh' ? '连接服务器失败' : 'Failed to connect to backend';
+    } finally {
+        if (unlockBtn) unlockBtn.disabled = false;
     }
 }
 
@@ -122,16 +146,14 @@ function handlePasswordEnter(e) {
     }
 }
 
-// 1. 语言与主题切换机制
+// ... (以下其余代码保持不变) ...
+
 function switchLanguage(lang) {
     if (!i18n[lang]) return;
     currentLang = lang;
-
     document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
     document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-
     const dict = i18n[lang];
-
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key]) el.innerHTML = dict[key];
@@ -144,7 +166,6 @@ function switchLanguage(lang) {
         const key = el.getAttribute('data-i18n-title');
         if (dict[key]) el.title = dict[key];
     });
-
     if (cachedSkillsData) renderSkills(cachedSkillsData);
 }
 
@@ -169,20 +190,16 @@ function toggleHud() {
 
 // 2. Canvas 粒子背景特效
 let currentMouseMode = 'connect';
-
 (function initCanvas() {
     if (window.innerWidth <= 860) return;
     const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
     let W, H, pts = [];
     const mouse = { x: -1000, y: -1000, radius: 140 };
-
     const resize = () => { W = c.width = window.innerWidth; H = c.height = window.innerHeight; };
     window.addEventListener('resize', resize);
     resize();
-
     const xEl = document.getElementById('hud-x');
     const yEl = document.getElementById('hud-y');
-
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
@@ -191,11 +208,8 @@ let currentMouseMode = 'connect';
             yEl.textContent = String(Math.round(mouse.y)).padStart(4, '0');
         }
     });
-
     window.addEventListener('mouseleave', () => { mouse.x = mouse.y = -1000; });
-
     const abstractColors = ['#ff3366', '#2244ff', '#ffee00', '#00e5ff', '#ff9900'];
-
     class Particle {
         constructor() { this.reset(); }
         reset() {
@@ -215,7 +229,6 @@ let currentMouseMode = 'connect';
             if (currentMouseMode !== 'off' && mouse.x > 0) {
                 const dx = mouse.x - this.x, dy = mouse.y - this.y;
                 const dist = Math.hypot(dx, dy);
-
                 if (dist < mouse.radius) {
                     const force = (mouse.radius - dist) / mouse.radius;
                     const angle = Math.atan2(dy, dx);
@@ -226,13 +239,11 @@ let currentMouseMode = 'connect';
                     }
                 }
             }
-
             this.x += this.vx;
             this.y += this.vy;
             this.angle += this.rotSpeed;
             this.vx += (this.baseVx - this.vx) * 0.05;
             this.vy += (this.baseVy - this.vy) * 0.05;
-
             if (this.x <= 0 || this.x >= W) { this.vx *= -1; this.baseVx *= -1; }
             if (this.y <= 0 || this.y >= H) { this.vy *= -1; this.baseVy *= -1; }
         }
@@ -240,7 +251,6 @@ let currentMouseMode = 'connect';
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
-
             if (currentTheme === 'cyberpunk') {
                 const color = (this.shape % 2 === 0) ? '#00f0ff' : '#b026ff';
                 ctx.strokeStyle = color;
@@ -248,7 +258,6 @@ let currentMouseMode = 'connect';
                 ctx.lineWidth = 1.5;
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = color;
-
                 if (this.shape % 2 === 0) {
                     ctx.strokeRect(-this.s/2, -this.s/2, this.s, this.s);
                 } else {
@@ -262,7 +271,6 @@ let currentMouseMode = 'connect';
                 ctx.strokeStyle = '#111111';
                 ctx.lineWidth = 2;
                 ctx.shadowBlur = 0;
-
                 if (this.shape === 0) {
                     ctx.beginPath();
                     ctx.arc(0, 0, this.s, 0, Math.PI * 2);
@@ -290,7 +298,6 @@ let currentMouseMode = 'connect';
                 ctx.fill();
             }
             ctx.restore();
-
             if (currentMouseMode === 'connect' && mouse.x > 0) {
                 const dist = Math.hypot(mouse.x - this.x, mouse.y - this.y);
                 if (dist < mouse.radius + 30) {
@@ -315,9 +322,7 @@ let currentMouseMode = 'connect';
             }
         }
     }
-
     for (let i = 0; i < 90; i++) pts.push(new Particle());
-
     (function anim() {
         ctx.clearRect(0, 0, W, H);
         pts.forEach(p => { p.update(); p.draw(); });
@@ -423,7 +428,6 @@ async function sendMessage() {
     `;
     const aiMsgEl = appendMessage(thinkingHtml, 'ai', true);
 
-    // 获取缓存的密码
     const password = sessionStorage.getItem('site_password') || '';
 
     try {

@@ -10,6 +10,7 @@ let cachedSkillsData = null;
 const i18n = {
     zh: {
         introPrompt: "请输入访问密码解锁",
+        passwordPlaceholder: "输入访问密码...",
         unlockBtn: "解锁",
         tagline: "越努力，越幸运",
         profileDesc: "<p>欢迎！右侧是我的 <strong>AI 分身</strong>。欢迎与它对话，探索解锁我的个人档案。</p>",
@@ -50,6 +51,7 @@ const i18n = {
     },
     en: {
         introPrompt: "ENTER PASSWORD TO UNLOCK",
+        passwordPlaceholder: "Enter password...",
         unlockBtn: "Unlock",
         tagline: "Fortune Favors the Sweat",
         profileDesc: "<p>Welcome! On the right is my <strong>AI avatar</strong>. Feel free to decrypt my profile by chatting with it.</p>",

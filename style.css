@@ -557,7 +557,9 @@ body {
     .container { flex-direction: column; }
     .social-sidebar { flex-direction: row; justify-content: center; width: 100%; }
     .left-card, .chat-card { width: 100%; max-width: 100%; }
-    #bg-canvas, .hud-stack { display: none; }
+    #bg-canvas { display: none; }
+    /* 修复：移动端仅隐藏不适用的鼠标坐标联动HUD，保留主题切换面板 */
+    #mouse-hud { display: none; }
     .lang-switch-container { top: 12px; right: 12px; }
 }
 

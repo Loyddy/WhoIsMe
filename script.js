@@ -20,6 +20,7 @@ const i18n = {
         failedProjects: "加载项目失败",
         skillsSummary: "📂 我的技能栈:",
         chatTitle: "AI 分身",
+        authSuccessMsg: "已授权", // 新增：授权成功提示
         initialMsg: "信号已建立。我王生卓的AI分身，您有什么想要了解的",
         prompt1Btn: "⚡ 核心技术栈",
         prompt1Query: "介绍一下他的核心技术栈？",
@@ -61,6 +62,7 @@ const i18n = {
         failedProjects: "Failed to load projects.",
         skillsSummary: "📂 My skills:",
         chatTitle: "AI Avatar",
+        authSuccessMsg: "Authorized", // 新增：授权成功提示
         initialMsg: "Signal established. What would you like to know about Loyd?",
         prompt1Btn: "⚡ Core Tech Stack",
         prompt1Query: "Can you introduce his core tech stack?",
@@ -118,6 +120,13 @@ async function verifyAndUnlock() {
         if (res.ok && data.success) {
             sessionStorage.setItem('site_password', pwd);
             errorEl.style.display = 'none';
+
+            // 修改部分：解锁成功后更新聊天框第一句话
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = `
+                <div class="message msg-ai">${i18n[currentLang].authSuccessMsg}</div>
+                <div class="message msg-ai">${i18n[currentLang].initialMsg}</div>
+            `;
 
             const overlay = document.getElementById('intro-overlay');
             if (overlay) {

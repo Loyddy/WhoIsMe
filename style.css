@@ -13,7 +13,6 @@
     --radius-lg: 24px;
 }
 
-/* ==================== 薰衣草风格开场入场遮罩组件 ==================== */
 .intro-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -113,29 +112,28 @@
     50% { opacity: 0.65; transform: translateY(-2px); }
 }
 
-/* 渐进式解锁主界面过渡 */
-.container, .hud-stack, .lang-switch-container {
+.container {
     opacity: 0;
     transform: translateY(25px);
     transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
 }
 
-body.unlocked .container,
-body.unlocked .hud-stack,
-body.unlocked .lang-switch-container {
+body.unlocked .container {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* ==================== 主题风格定义 ==================== */
+.hud-stack, .lang-switch-container {
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 100;
+}
 
-/* 1. 默认：薰衣草柔光 */
 body[data-theme="default"] {
     background: radial-gradient(circle at 20% 20%, #ffffff, #f3effa 60%, #eee8f7 100%);
     color: var(--text-primary);
 }
 
-/* 2. 赛博朋克风 Cyberpunk (极客霓虹蓝紫版) */
 body[data-theme="cyberpunk"] {
     --bg-card: rgba(8, 11, 22, 0.88);
     --border-glow: #00f0ff;
@@ -244,7 +242,6 @@ body[data-theme="cyberpunk"] .prompt-btn:hover {
     border-color: #00f0ff;
 }
 
-/* 3. 五彩抽象几何风 Abstract Geometric */
 body[data-theme="abstract"] {
     --bg-card: rgba(255, 255, 255, 0.92);
     --border-glow: #111111;
@@ -313,7 +310,6 @@ body[data-theme="abstract"] .prompt-btn:hover {
     box-shadow: 2px 2px 0px #111111;
 }
 
-/* 基础 Layout */
 body {
     min-height: 100vh;
     display: flex;
@@ -333,11 +329,9 @@ body {
     pointer-events: none;
 }
 
-/* ==================== 语言切换组件 ==================== */
 .lang-switch-container {
     position: fixed;
     top: 20px; right: 20px;
-    z-index: 100;
     background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(224, 215, 247, 0.9);
@@ -371,7 +365,6 @@ body {
 }
 .lang-divider { color: var(--accent-purple); opacity: 0.5; font-size: 10px; }
 
-/* ==================== 容器布局 ==================== */
 .container {
     display: flex;
     gap: 20px;
@@ -383,7 +376,6 @@ body {
     padding: 20px 0;
 }
 
-/* ==================== 侧边栏与卡片 ==================== */
 .social-sidebar {
     background: var(--bg-card);
     backdrop-filter: blur(16px);
@@ -457,7 +449,6 @@ body {
 .tree-container ul { list-style: none; padding-left: 18px; border-left: 1px dashed rgba(155, 135, 202, 0.3); margin: 4px 0; }
 .tree-container li { margin: 4px 0; color: inherit; }
 
-/* 统一滚动条样式 */
 .repo-list, .chat-box {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-purple) transparent;
@@ -471,7 +462,6 @@ body {
 .repo-card-title { display: flex; justify-content: space-between; font-size: 13px; color: var(--accent-deep-purple); font-weight: 600; }
 .repo-card-desc { font-size: 11px; opacity: 0.85; margin-top: 2px; }
 
-/* ==================== Chat 卡片 ==================== */
 .chat-card {
     flex: 1 1 50%; min-width: 340px;
     padding: 28px 24px 20px;
@@ -486,7 +476,6 @@ body {
 .msg-ai { align-self: flex-start; }
 .msg-user { align-self: flex-end; }
 
-/* 量子声浪动画 */
 .quantum-thinking { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--accent-deep-purple); font-weight: 500; }
 .wave-bars { display: flex; align-items: center; gap: 3px; height: 16px; }
 .wave-bar {
@@ -506,7 +495,6 @@ body {
     50% { transform: scaleY(1); opacity: 1; }
 }
 
-/* 快捷提问气泡 */
 .quick-prompts { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 8px; scrollbar-width: none; }
 .quick-prompts::-webkit-scrollbar { display: none; }
 .prompt-btn {
@@ -519,17 +507,14 @@ body {
     font-family: inherit;
 }
 
-/* 输入区域 */
 .input-area { display: flex; gap: 8px; background: #ffffff; padding: 4px; border-radius: 80px; border: 1px solid rgba(224, 215, 247, 0.9); }
 .input-area input { flex: 1; padding: 12px 16px; background: transparent; border: none; outline: none; font-family: inherit; }
 .input-area button { background: linear-gradient(145deg, var(--accent-purple), var(--accent-deep-purple)); border: none; color: white; padding: 0 22px; border-radius: 60px; cursor: pointer; transition: 0.2s; font-weight: 500; }
 .btn-reset { background: rgba(255, 90, 90, 0.1) !important; color: #e54d4d !important; border: 1px solid rgba(255, 90, 90, 0.2) !important; padding: 0 14px !important; }
 
-/* ==================== HUD 堆叠面板区域 ==================== */
 .hud-stack {
     position: fixed;
     bottom: 20px; right: 20px;
-    z-index: 100;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -568,7 +553,6 @@ body {
 .mouse-hud.collapsed .hud-body { display: none; }
 .mouse-hud.collapsed { width: auto; padding: 8px 12px; }
 
-/* 响应式适配 */
 @media (max-width: 860px) {
     .container { flex-direction: column; }
     .social-sidebar { flex-direction: row; justify-content: center; width: 100%; }
@@ -577,7 +561,6 @@ body {
     .lang-switch-container { top: 12px; right: 12px; }
 }
 
-/* ==================== 密码验证表单样式 ==================== */
 .password-group {
     display: flex;
     gap: 10px;

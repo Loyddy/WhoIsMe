@@ -9,7 +9,6 @@
 </head>
 <body data-theme="default">
 
-<!-- 薰衣草风格开场入场遮罩组件（集成密码验证） -->
 <div id="intro-overlay" class="intro-overlay">
     <div class="intro-content">
         <div class="intro-character-wrapper">
@@ -22,7 +21,6 @@
         <div class="intro-prompt" data-i18n="introPrompt">请输入访问密码解锁</div>
         <div class="intro-subtext">[ ENTER PASSWORD TO UNLOCK ]</div>
 
-        <!-- 密码输入表单（不显示明文） -->
         <div class="password-group">
             <input type="password" id="site-password" placeholder="输入访问密码..." onkeydown="handlePasswordEnter(event)">
             <button onclick="verifyAndUnlock()" data-i18n="unlockBtn">解锁</button>
@@ -33,7 +31,6 @@
 
 <canvas id="bg-canvas"></canvas>
 
-<!-- 右上角语言切换选择器 -->
 <div class="lang-switch-container">
     <button class="lang-btn active" id="lang-zh" onclick="switchLanguage('zh')">中</button>
     <span class="lang-divider">/</span>
@@ -41,7 +38,6 @@
 </div>
 
 <div class="container">
-    <!-- 左侧窄边栏社交图标 -->
     <div class="social-sidebar">
         <a href="https://github.com/Loyddy" target="_blank" title="GitHub" class="sidebar-icon-btn">
             <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -51,7 +47,6 @@
         </a>
     </div>
 
-    <!-- 左侧卡片 -->
     <div class="card left-card">
         <div class="profile-header">
             <div class="avatar">
@@ -76,7 +71,6 @@
         </div>
     </div>
 
-    <!-- 右侧 AI 聊天卡片 -->
     <div class="card chat-card">
         <div class="chat-title" data-i18n="chatTitle">AI 分身</div>
         <div class="chat-box" id="chat-box">
@@ -98,7 +92,6 @@
     </div>
 </div>
 
-<!-- 右下角 Stack HUDs 面板组 -->
 <div class="hud-stack">
     <div class="mouse-hud theme-hud" id="theme-hud">
         <div class="hud-header" onclick="toggleThemeHud()">

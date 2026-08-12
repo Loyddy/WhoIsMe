@@ -1,7 +1,7 @@
 const BACKEND_BASE = "https://backend-render-qs89.onrender.com";
 const CHAT_URL = `${BACKEND_BASE}/api/chat`;
 const PORTFOLIO_URL = `${BACKEND_BASE}/api/portfolio`;
-const VERIFY_URL = `${BACKEND_BASE}/api/verify`; // 新增
+const VERIFY_URL = `${BACKEND_BASE}/api/verify`;
 
 let currentLang = 'zh';
 let currentTheme = 'default';
@@ -90,7 +90,6 @@ const i18n = {
     }
 };
 
-// 密码验证并解锁主界面
 async function verifyAndUnlock() {
     const passwordInput = document.getElementById('site-password');
     const errorEl = document.getElementById('password-error');
@@ -139,14 +138,42 @@ async function verifyAndUnlock() {
     }
 }
 
+async function checkStoredPassword() {
+    const savedPwd = sessionStorage.getItem('site_password');
+    if (!savedPwd) return;
+
+    try {
+        const res = await fetch(VERIFY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: savedPwd })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            const overlay = document.getElementById('intro-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                document.body.classList.add('unlocked');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 800);
+            }
+        } else {
+            sessionStorage.removeItem('site_password');
+        }
+    } catch (err) {
+        console.error("Auto-verification failed:", err);
+    }
+}
+
 function handlePasswordEnter(e) {
     if (e.key === 'Enter' && !e.isComposing) {
         e.preventDefault();
         verifyAndUnlock();
     }
 }
-
-// ... (以下其余代码保持不变) ...
 
 function switchLanguage(lang) {
     if (!i18n[lang]) return;
@@ -188,7 +215,6 @@ function toggleHud() {
     document.getElementById('hud-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
 }
 
-// 2. Canvas 粒子背景特效
 let currentMouseMode = 'connect';
 (function initCanvas() {
     if (window.innerWidth <= 860) return;
@@ -336,7 +362,6 @@ function setMouseMode(mode, btn) {
     if (btn) btn.classList.add('active');
 }
 
-// 3. 后端 API 交互
 async function loadPortfolioData() {
     try {
         const res = await fetch(PORTFOLIO_URL);
@@ -384,7 +409,6 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 4. AI 聊天功能（自动携带密码校验）
 let chatHistory = [];
 let isSending = false;
 
@@ -440,7 +464,14 @@ async function sendMessage() {
         const data = await res.json();
 
         if (res.status === 401) {
-            updateMessageElement(aiMsgEl, data.reply || "⚠️ 密码错误，请刷新页面重新输入正确密码。", false);
+            sessionStorage.removeItem('site_password');
+            updateMessageElement(aiMsgEl, data.reply || "⚠️ 密码已失效或错误，请重新输入密码解锁。", false);
+            const overlay = document.getElementById('intro-overlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                overlay.classList.remove('hidden');
+                document.body.classList.remove('unlocked');
+            }
             return;
         }
 
@@ -510,4 +541,5 @@ function handleEnter(e) {
 window.addEventListener('DOMContentLoaded', () => {
     switchLanguage('zh');
     loadPortfolioData();
+    checkStoredPassword();
 });

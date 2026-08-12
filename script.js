@@ -8,7 +8,8 @@ let cachedSkillsData = null;
 
 const i18n = {
     zh: {
-        introPrompt: "点击解锁",
+        introPrompt: "请输入访问密码解锁",
+        unlockBtn: "解锁",
         tagline: "越努力，越幸运",
         profileDesc: "<p>欢迎！右侧是我的 <strong>AI 分身</strong>。欢迎与它对话，探索解锁我的个人档案。</p>",
         techStackTitle: "核心技术栈",
@@ -17,7 +18,7 @@ const i18n = {
         failedProjects: "加载项目失败",
         skillsSummary: "📂 我的技能栈:",
         chatTitle: "AI 分身",
-        initialMsg: "我是他的AI分身。你想了解关于他的什么信息？",
+        initialMsg: "信号已建立。我是 Master 的量子回响。告诉我你的身份，你想解密关于 Master 的什么信息？",
         prompt1Btn: "⚡ 核心技术栈",
         prompt1Query: "介绍一下他的核心技术栈？",
         prompt2Btn: "💼 精选项目",
@@ -47,7 +48,8 @@ const i18n = {
         connLost: "❌ 网络连接中断。"
     },
     en: {
-        introPrompt: "✨ CLICK TO UNLOCK MASTER'S DIGITAL ECHO",
+        introPrompt: "ENTER PASSWORD TO UNLOCK",
+        unlockBtn: "Unlock",
         tagline: "Fortune Favors the Sweat",
         profileDesc: "<p>Welcome! On the right is my <strong>AI avatar</strong>. Feel free to decrypt my profile by chatting with it.</p>",
         techStackTitle: "Tech Stack Tree",
@@ -56,7 +58,7 @@ const i18n = {
         failedProjects: "Failed to load projects.",
         skillsSummary: "📂 My skills:",
         chatTitle: "AI Avatar",
-        initialMsg: "I am his AI avatar. What would you like to decrypt about him?",
+        initialMsg: "Signal established. I am Master's digital echo. What would you like to decrypt about him?",
         prompt1Btn: "⚡ Core Tech Stack",
         prompt1Query: "Can you introduce his core tech stack?",
         prompt2Btn: "💼 Featured Projects",
@@ -87,8 +89,22 @@ const i18n = {
     }
 };
 
-// 开场动画解锁主界面
-function enterMainSite() {
+// 密码验证并解锁主界面
+async function verifyAndUnlock() {
+    const passwordInput = document.getElementById('site-password');
+    const errorEl = document.getElementById('password-error');
+    const pwd = passwordInput.value.trim();
+
+    if (!pwd) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = currentLang === 'zh' ? '密码不能为空' : 'Password cannot be empty';
+        return;
+    }
+
+    // 将密码暂存到 sessionStorage
+    sessionStorage.setItem('site_password', pwd);
+
+    // 尝试发送一条测试聊天或直接解锁，由后端在正式发消息时把关
     const overlay = document.getElementById('intro-overlay');
     if (overlay) {
         overlay.classList.add('hidden');
@@ -96,6 +112,13 @@ function enterMainSite() {
         setTimeout(() => {
             overlay.style.display = 'none';
         }, 800);
+    }
+}
+
+function handlePasswordEnter(e) {
+    if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        verifyAndUnlock();
     }
 }
 
@@ -144,7 +167,7 @@ function toggleHud() {
     document.getElementById('hud-toggle-icon').textContent = hud.classList.contains('collapsed') ? '+' : '−';
 }
 
-// 2. Multi-Theme Canvas 粒子/几何背景特效
+// 2. Canvas 粒子背景特效
 let currentMouseMode = 'connect';
 
 (function initCanvas() {
@@ -356,7 +379,7 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 4. AI 聊天功能
+// 4. AI 聊天功能（自动携带密码校验）
 let chatHistory = [];
 let isSending = false;
 
@@ -400,15 +423,24 @@ async function sendMessage() {
     `;
     const aiMsgEl = appendMessage(thinkingHtml, 'ai', true);
 
+    // 获取缓存的密码
+    const password = sessionStorage.getItem('site_password') || '';
+
     try {
         const res = await fetch(CHAT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, history: chatHistory })
+            body: JSON.stringify({ message: text, history: chatHistory, password: password })
         });
 
-        if (!res.ok) throw new Error(`Status: ${res.status}`);
         const data = await res.json();
+
+        if (res.status === 401) {
+            updateMessageElement(aiMsgEl, data.reply || "⚠️ 密码错误，请刷新页面重新输入正确密码。", false);
+            return;
+        }
+
+        if (!res.ok) throw new Error(`Status: ${res.status}`);
 
         if (data.reply) {
             updateMessageElement(aiMsgEl, data.reply, true);

@@ -126,7 +126,7 @@ body.unlocked .container {
 .hud-stack, .lang-switch-container {
     opacity: 1;
     transform: translateY(0);
-    z-index: 100;
+    z-index: 100000;
 }
 
 body[data-theme="default"] {

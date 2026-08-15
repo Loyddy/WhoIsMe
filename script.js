@@ -19,6 +19,8 @@ const i18n = {
         failedSkills: "加载技能失败",
         failedProjects: "加载项目失败",
         skillsSummary: "📂 我的技能栈:",
+        skillUsagePrompt: "请用中文说明“{skill}”在他的哪些项目中使用到了，并简要介绍具体用途。",
+        skillUsageTitle: "点击询问该技能的项目用途",
         chatTitle: "AI 分身",
         authSuccessMsg: "已授权", // 新增：授权成功提示
         initialMsg: "信号已建立。我王生卓的AI分身，您有什么想要了解的",
@@ -61,6 +63,8 @@ const i18n = {
         failedSkills: "Failed to load skills.",
         failedProjects: "Failed to load projects.",
         skillsSummary: "📂 My skills:",
+        skillUsagePrompt: "Please explain in English which of his projects use “{skill}” and what it is used for.",
+        skillUsageTitle: "Click to ask where this skill is used",
         chatTitle: "AI Avatar",
         authSuccessMsg: "Authorized", // 新增：授权成功提示
         initialMsg: "Signal established. What would you like to know about Loyd?",
@@ -395,16 +399,23 @@ function renderSkills(skills) {
         if (s.subcategories) {
             s.subcategories.forEach(sub => {
                 html += `<li><details><summary>📁 ${escapeHtml(sub.title)}</summary><ul>`;
-                sub.items.forEach(i => html += `<li>📄 ${escapeHtml(i)}</li>`);
+                sub.items.forEach(i => html += renderSkillLeaf(i));
                 html += '</ul></details></li>';
             });
         } else if (s.items) {
-            s.items.forEach(i => html += `<li>📄 ${escapeHtml(i)}</li>`);
+            s.items.forEach(i => html += renderSkillLeaf(i));
         }
         html += '</ul></details></li>';
     });
     html += '</ul></details>';
     document.getElementById('tree-container').innerHTML = html;
+    document.querySelectorAll('.skill-leaf').forEach(button => {
+        button.addEventListener('click', () => askSkillUsage(button.dataset.skill));
+    });
+}
+
+function renderSkillLeaf(skill) {
+    return `<li><button type="button" class="skill-leaf" data-skill="${escapeAttribute(skill)}" title="${escapeAttribute(i18n[currentLang].skillUsageTitle)}">📄 ${escapeHtml(skill)}</button></li>`;
 }
 
 function renderProjects(projects) {
@@ -420,8 +431,22 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function escapeAttribute(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 let chatHistory = [];
 let isSending = false;
+let pendingSkill = '';
+
+function askSkillUsage(skill) {
+    if (isSending || !skill) return;
+    const prompt = i18n[currentLang].skillUsagePrompt.replace('{skill}', skill);
+    const input = document.getElementById('user-input');
+    input.value = prompt;
+    pendingSkill = skill;
+    sendMessage();
+}
 
 function sendQuickPrompt(queryKey) {
     if (isSending) return;
@@ -437,6 +462,7 @@ function setFormDisabled(disabled) {
     const sendBtn = document.getElementById('send-btn');
     if (sendBtn) sendBtn.disabled = disabled;
     document.querySelectorAll('.prompt-btn').forEach(btn => btn.disabled = disabled);
+    document.querySelectorAll('.skill-leaf').forEach(btn => btn.disabled = disabled);
 }
 
 async function sendMessage() {
@@ -447,6 +473,8 @@ async function sendMessage() {
 
     isSending = true;
     input.value = '';
+    const selectedSkill = pendingSkill;
+    pendingSkill = '';
     setFormDisabled(true);
 
     appendMessage(text, 'user');
@@ -469,7 +497,7 @@ async function sendMessage() {
         const res = await fetch(CHAT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, history: chatHistory, password: password })
+            body: JSON.stringify({ message: text, skill: selectedSkill, history: chatHistory, password: password })
         });
 
         const data = await res.json();

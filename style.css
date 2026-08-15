@@ -447,12 +447,34 @@ body {
 .tree-container { background: rgba(248, 245, 253, 0.4); border: 1px solid rgba(224, 215, 247, 0.8); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: var(--text-secondary); }
 .tree-container summary { cursor: pointer; color: var(--accent-deep-purple); font-weight: 500; padding: 3px 6px; list-style: none; }
 .tree-container summary::-webkit-details-marker { display: none; }
-.tree-container summary::before { content: '›'; display: inline-block; margin-right: 5px; transition: transform 0.25s ease; }
+.tree-container summary { border-radius: 6px; transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease, text-shadow 0.25s ease; }
+.tree-container summary:hover { background: rgba(224, 215, 247, 0.45); transform: translateX(2px); }
+.tree-container summary::before { content: '›'; display: inline-block; margin-right: 5px; transition: transform 0.3s ease, color 0.25s ease; }
 .tree-container details[open] > summary::before { transform: rotate(90deg); }
+.tree-container details[open] > summary { color: var(--accent-deep-purple); text-shadow: 0 0 10px rgba(155, 135, 202, 0.35); }
 .tree-container .details-content { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease, opacity 0.25s ease; }
 .tree-container details[open] > .details-content { max-height: 900px; opacity: 1; }
+.tree-container .details-content > ul { position: relative; animation: branchReveal 0.45s ease both; }
 .tree-container ul { list-style: none; padding-left: 18px; border-left: 1px dashed rgba(155, 135, 202, 0.3); margin: 4px 0; }
 .tree-container li { margin: 4px 0; color: inherit; }
+.tree-container details[open] > .details-content > ul > .skill-node { animation: skillNodeReveal 0.35s ease both; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(1) { animation-delay: 0.04s; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(2) { animation-delay: 0.09s; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(3) { animation-delay: 0.14s; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(4) { animation-delay: 0.19s; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(5) { animation-delay: 0.24s; }
+.tree-container details[open] > .details-content > ul > .skill-node:nth-child(6) { animation-delay: 0.29s; }
+
+@keyframes branchReveal {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes skillNodeReveal {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
 .skill-leaf {
     display: inline-block;
     padding: 3px 6px;

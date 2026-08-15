@@ -395,10 +395,10 @@ async function loadPortfolioData() {
 function renderSkills(skills) {
     let html = `<details class="skill-group"><summary>${i18n[currentLang].skillsSummary}</summary><div class="details-content"><ul>`;
     skills.forEach(s => {
-        html += `<li><details class="skill-group"><summary>📁 ${escapeHtml(s.category)}</summary><div class="details-content"><ul>`;
+        html += `<li class="skill-node"><details class="skill-group"><summary>📁 ${escapeHtml(s.category)}</summary><div class="details-content"><ul>`;
         if (s.subcategories) {
             s.subcategories.forEach(sub => {
-                html += `<li><details class="skill-group"><summary>📁 ${escapeHtml(sub.title)}</summary><div class="details-content"><ul>`;
+                html += `<li class="skill-node"><details class="skill-group"><summary>📁 ${escapeHtml(sub.title)}</summary><div class="details-content"><ul>`;
                 sub.items.forEach(i => html += renderSkillLeaf(i));
                 html += '</ul></div></details></li>';
             });
@@ -415,7 +415,7 @@ function renderSkills(skills) {
 }
 
 function renderSkillLeaf(skill) {
-    return `<li><button type="button" class="skill-leaf" data-skill="${escapeAttribute(skill)}" title="${escapeAttribute(i18n[currentLang].skillUsageTitle)}">📄 ${escapeHtml(skill)}</button></li>`;
+    return `<li class="skill-node"><button type="button" class="skill-leaf" data-skill="${escapeAttribute(skill)}" title="${escapeAttribute(i18n[currentLang].skillUsageTitle)}">📄 ${escapeHtml(skill)}</button></li>`;
 }
 
 function renderProjects(projects) {

@@ -517,7 +517,7 @@ async function sendMessage() {
         if (!res.ok) throw new Error(`Status: ${res.status}`);
 
         if (data.reply) {
-            updateMessageElement(aiMsgEl, data.reply, true);
+            await typeMessageElement(aiMsgEl, data.reply);
             chatHistory.push({ role: "user", content: text }, { role: "assistant", content: data.reply });
         } else {
             updateMessageElement(aiMsgEl, i18n[currentLang].errReply, false);
@@ -551,6 +551,22 @@ function appendMessage(text, sender, isHtml = false) {
 function updateMessageElement(el, text, isAi) {
     el.innerHTML = (isAi && typeof marked !== 'undefined') ? marked.parse(text) : escapeHtml(text);
     scrollToBottom();
+}
+
+async function typeMessageElement(el, text) {
+    const characters = Array.from(String(text));
+    const typingSpeed = 14;
+    el.classList.add('is-typing');
+    el.textContent = '';
+
+    for (const character of characters) {
+        el.textContent += character;
+        scrollToBottom();
+        await new Promise(resolve => setTimeout(resolve, typingSpeed));
+    }
+
+    el.classList.remove('is-typing');
+    updateMessageElement(el, text, true);
 }
 
 function scrollToBottom() {

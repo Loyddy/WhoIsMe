@@ -393,21 +393,21 @@ async function loadPortfolioData() {
 }
 
 function renderSkills(skills) {
-    let html = `<details><summary>${i18n[currentLang].skillsSummary}</summary><ul>`;
+    let html = `<details class="skill-group"><summary>${i18n[currentLang].skillsSummary}</summary><div class="details-content"><ul>`;
     skills.forEach(s => {
-        html += `<li><details><summary>📁 ${escapeHtml(s.category)}</summary><ul>`;
+        html += `<li><details class="skill-group"><summary>📁 ${escapeHtml(s.category)}</summary><div class="details-content"><ul>`;
         if (s.subcategories) {
             s.subcategories.forEach(sub => {
-                html += `<li><details><summary>📁 ${escapeHtml(sub.title)}</summary><ul>`;
+                html += `<li><details class="skill-group"><summary>📁 ${escapeHtml(sub.title)}</summary><div class="details-content"><ul>`;
                 sub.items.forEach(i => html += renderSkillLeaf(i));
-                html += '</ul></details></li>';
+                html += '</ul></div></details></li>';
             });
         } else if (s.items) {
             s.items.forEach(i => html += renderSkillLeaf(i));
         }
-        html += '</ul></details></li>';
+        html += '</ul></div></details></li>';
     });
-    html += '</ul></details>';
+    html += '</ul></div></details>';
     document.getElementById('tree-container').innerHTML = html;
     document.querySelectorAll('.skill-leaf').forEach(button => {
         button.addEventListener('click', () => askSkillUsage(button.dataset.skill));
@@ -481,6 +481,7 @@ async function sendMessage() {
 
     const thinkingHtml = `
         <div class="quantum-thinking">
+            <span class="thinking-orbit" aria-hidden="true"><span></span></span>
             <span>${i18n[currentLang].thinkingText}</span>
             <div class="wave-bars">
                 <div class="wave-bar"></div><div class="wave-bar"></div>
@@ -535,7 +536,7 @@ async function sendMessage() {
 function appendMessage(text, sender, isHtml = false) {
     const box = document.getElementById('chat-box');
     const div = document.createElement('div');
-    div.className = `message msg-${sender}`;
+    div.className = `message msg-${sender} message-enter`;
     box.appendChild(div);
 
     if (isHtml) {
